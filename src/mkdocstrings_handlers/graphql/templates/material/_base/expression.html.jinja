@@ -1,0 +1,30 @@
+{#- Template for expressions.
+
+Renders an expression which is a tree-like structure representing a GraphQL
+expression.
+-#}
+
+{% block logs scoped %}
+    {#- Logging block. -#}
+{% endblock logs %}
+
+{%- macro crossref(name, backlink_type="") -%}
+{%- endmacro -%}
+
+{%- macro render(expression, backlink_type="") -%}
+    {#- Renders an expression.
+
+    Args:
+        expression: The expression to render.
+
+    Returns:
+        The rendered expression.
+    -#}
+    {%- if expression is string -%}
+        {%- if signature -%}{{ expression|safe }}{%- else -%}{{ expression }}{%- endif -%}
+    {%- else -%}
+        {{ expression.render }}
+    {%- endif -%}
+{%- endmacro -%}
+
+{{ render(expression, backlink_type|default("")) }}

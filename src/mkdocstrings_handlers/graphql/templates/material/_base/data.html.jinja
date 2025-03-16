@@ -42,7 +42,7 @@ Context:
 
       This block renders the signature for the data.
       -#}
-      {{ data.signature | highlight(language="graphql") }}
+      {#- {{ data.signature | highlight(language="graphql") }} -#}
     {% endblock signature %}
 
     <div class="doc doc-contents {% if root %}first{% endif %}">

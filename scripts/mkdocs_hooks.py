@@ -1,4 +1,4 @@
-# Generate a JSON schema of the Graphql handler configuration.
+# Generate a JSON schema of the GraphQL handler configuration.
 
 import json
 from dataclasses import dataclass, fields
@@ -8,7 +8,10 @@ from typing import Any
 from mkdocs.config.defaults import MkDocsConfig
 from mkdocs.plugins import get_plugin_logger
 
-from mkdocstrings_handlers.graphql._internal.config import GraphqlInputConfig, GraphqlInputOptions
+from mkdocstrings_handlers.graphql._internal.config import (
+    GraphQLInputConfig,
+    GraphQLInputOptions,
+)
 
 # TODO: Update when Pydantic supports Python 3.14 (sources and duties as well).
 try:
@@ -27,10 +30,10 @@ def on_post_build(config: MkDocsConfig, **kwargs: Any) -> None:  # noqa: ARG001
         return
 
     @dataclass
-    class GraphqlHandlerSchema:
-        graphql: GraphqlInputConfig
+    class GraphQLHandlerSchema:
+        graphql: GraphQLInputConfig
 
-    adapter = TypeAdapter(GraphqlHandlerSchema)
+    adapter = TypeAdapter(GraphQLHandlerSchema)
     schema = adapter.json_schema()
     schema["$schema"] = "https://json-schema.org/draft-07/schema"
     with open(join(config.site_dir, "schema.json"), "w") as file:
@@ -38,9 +41,9 @@ def on_post_build(config: MkDocsConfig, **kwargs: Any) -> None:  # noqa: ARG001
         _logger.debug("Generated JSON schema")
 
     autorefs = config["plugins"]["autorefs"]
-    for field in fields(GraphqlInputConfig):  # type: ignore[arg-type]
+    for field in fields(GraphQLInputConfig):  # type: ignore[arg-type]
         if f"setting-{field.name}" not in autorefs._primary_url_map:
             _logger.warning(f"Handler setting `{field.name}` is not documented")
-    for field in fields(GraphqlInputOptions):  # type: ignore[arg-type]
+    for field in fields(GraphQLInputOptions):  # type: ignore[arg-type]
         if f"option-{field.name}" not in autorefs._primary_url_map:
             _logger.warning(f"Configuration option `{field.name}` is not documented")
