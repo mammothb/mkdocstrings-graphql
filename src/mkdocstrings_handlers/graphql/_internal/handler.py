@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import glob
-from contextlib import chdir
+import sys
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar, final
 
 from mkdocs.exceptions import PluginError
 from mkdocstrings import BaseHandler, CollectionError, CollectorItem, get_logger
@@ -14,17 +14,33 @@ from mkdocstrings_handlers.graphql._internal.config import GraphQLConfig, GraphQ
 from mkdocstrings_handlers.graphql._internal.loader import Loader
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping, MutableMapping
+    from collections.abc import Iterator, Mapping, MutableMapping
 
     from mkdocs.config.defaults import MkDocsConfig
     from mkdocstrings import HandlerOptions
 
     from mkdocstrings_handlers.graphql._internal.models import SchemaName
 
+if sys.version_info >= (3, 11):
+    from contextlib import chdir
+else:
+    import os
+    from contextlib import contextmanager
+
+    @contextmanager
+    def chdir(path: str) -> Iterator[None]:
+        curr_dir = os.getcwd()
+        os.chdir(path)
+        try:
+            yield
+        finally:
+            os.chdir(curr_dir)
+
 
 _logger = get_logger(__name__)
 
 
+@final
 class GraphQLHandler(BaseHandler):
     """The GraphQL handler class."""
 
@@ -53,7 +69,7 @@ class GraphQLHandler(BaseHandler):
 
         schemas = config.schemas or {}
         with chdir(str(self.base_dir)):
-            resolved_schemas = {}
+            resolved_schemas: dict[SchemaName, list[str]] = {}
             for name, paths in schemas.items():
                 resolved_schemas[name] = []
                 for path in paths:
@@ -83,7 +99,7 @@ class GraphQLHandler(BaseHandler):
         except Exception as error:
             raise PluginError(f"Invalid options: {error}") from error
 
-    def collect(self, identifier: str, _options: GraphQLOptions) -> CollectorItem:
+    def collect(self, identifier: str, options: GraphQLOptions) -> CollectorItem:  # noqa: ARG002
         """Collect data given an identifier and selection configuration.
 
         Args:

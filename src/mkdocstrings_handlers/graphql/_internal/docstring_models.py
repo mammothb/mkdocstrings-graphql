@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Any, ClassVar
 
 from mkdocstrings_handlers.graphql._internal.enum import DocstringSectionKind

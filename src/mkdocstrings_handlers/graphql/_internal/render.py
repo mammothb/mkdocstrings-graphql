@@ -27,7 +27,6 @@ def format_signature(
         callable_path: The path of the callable we render the signature of.
         operation: The operation we render the signature of.
         annotations: Whether to show type annotation.
-        crossrefs: Whether to cross-reference types in the signature.
 
     Returns:
         The same code, formatted.

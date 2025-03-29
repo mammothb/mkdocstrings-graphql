@@ -7,13 +7,13 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 from markdown.core import Markdown
-from mkdocs import config
 from mkdocs.config.defaults import MkDocsConfig
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
     from pathlib import Path
 
+    from mkdocs import config
     from mkdocstrings.plugin import MkdocstringsPlugin
 
     from mkdocstrings_handlers.graphql import GraphQLHandler
