@@ -8,16 +8,17 @@ else:
 
 class DocstringSectionKind(StrEnum):
     ARGUMENTS = "arguments"
+    FIELDS = "fields"
     RETURNS = "returns"
 
 
 class Kind(StrEnum):
-    ENUM = "enum"
-    INPUT = "input"
-    INTERFACE = "interface"
-    OBJECT = "object"
-    OPERATION = "operation"
-    SCALAR = "scalar"
-    SCHEMA = "schema"
-    TYPE = "type"
-    UNION = "union"
+    ENUM = "gql_enum"
+    INPUT = "gql_input"
+    INTERFACE = "gql_interface"
+    OBJECT = "gql_object"
+    OPERATION = "gql_operation"
+    SCALAR = "gql_scalar"
+    SCHEMA = "gql_schema"
+    TYPE = "gql_type"
+    UNION = "gql_union"

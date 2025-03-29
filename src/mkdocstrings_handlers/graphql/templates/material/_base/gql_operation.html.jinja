@@ -3,7 +3,7 @@
 This template renders a GraphQL mutation, query, or subscription.
 
 Context:
-    operation (OperationTypeDefinition): The operation to render.
+    gql_operation (OperationTypeDefinition): The operation to render.
     root (bool): Whether this is the root object, injected with `:::` in a
         Markdown page.
     heading_level (int): The HTML heading level to use.
@@ -12,11 +12,11 @@ Context:
 
 {% block logs scoped %}
     {#- Logging block -#}
-    {{ log.debug("Rendering " + operation.path) }}
+    {{ log.debug("Rendering " + gql_operation.path) }}
 {% endblock logs %}
 
-<div class="doc doc-object doc-operation">
-    {% with obj = operation, html_id = operation.path %}
+<div class="doc doc-object doc-gql-operation">
+    {% with obj = gql_operation, html_id = gql_operation.path %}
         {% if root %}
             {% set show_full_path = config.show_root_full_path %}
             {% set root_members = True %}
@@ -27,16 +27,16 @@ Context:
             {% set show_full_path = config.show_node_full_path %}
         {% endif %}
 
-        {% set operation_name = operation.path if show_full_path else operation.name %}
-        {% set symbol_type = operation.kind %}
+        {% set gql_operation_name = gql_operation.path if show_full_path else gql_operation.name %}
+        {% set symbol_type = gql_operation.kind %}
 
         {% if not root or config.show_root_heading %}
             {% filter heading(
                 heading_level,
-                role="operation",
+                role="gql_operation",
                 id=html_id,
                 class="doc doc-heading",
-                toc_label=('<code class=doc-symbol doc-symbol-toc doc-symbol-' + symbol_type + '"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + operation.name,
+                toc_label=('<code class=doc-symbol doc-symbol-toc doc-symbol-' + symbol_type + '"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + gql_operation.name,
             ) %}
                 {% block heading scoped %}
                     {#- Heading block.
@@ -44,7 +44,7 @@ Context:
                     Renders the heading for the operation.
                     -#}
                     {% if config.show_symbol_type_heading %}<code class="doc-symbol doc-symbol-heading doc-symbol-{{ symbol_type }}"></code>{% endif %}
-                    <span class="doc doc-object-name doc-operation-name">{{ config.heading if config.heading and root else operation_name }}</span>
+                    <span class="doc doc-object-name doc-gql-operation-name">{{ config.heading if config.heading and root else gql_operation_name }}</span>
                 {% endblock heading %}
             {% endfilter %}
 
@@ -53,8 +53,8 @@ Context:
 
                 Renders the signature for the operation.
                 -#}
-                {% filter format_signature(operation) %}
-                    {{ operation.name }}
+                {% filter format_signature(gql_operation) %}
+                    {{ gql_operation.name }}
                 {% endfilter %}
             {% endblock signature %}
 
@@ -63,9 +63,9 @@ Context:
             {% if config.show_root_toc_entry %}
                 {% filter heading(
                     heading_level,
-                    role="operation",
+                    role="gql_operation",
                     id=html_id,
-                    toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-' + symbol_type + '"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else operation.name),
+                    toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-' + symbol_type + '"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + (config.toc_label if config.toc_label and root else gql_operation.name),
                     hidden=True,
                 ) %}
                 {% endfilter %}
@@ -83,7 +83,7 @@ Context:
                 -#}
                 {% block docstring scoped %}
                     {#- Docstring block. -#}
-                    {% with docstring_sections = operation.docstring %}
+                    {% with docstring_sections = gql_operation.docstring %}
                         {% include "docstring.html.jinja" %}
                     {% endwith %}
                 {% endblock docstring %}

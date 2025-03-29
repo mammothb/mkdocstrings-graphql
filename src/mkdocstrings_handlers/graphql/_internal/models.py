@@ -5,9 +5,11 @@ from typing import TYPE_CHECKING, Any, ClassVar
 
 from mkdocstrings_handlers.graphql._internal.docstring_models import (
     DocstringArgument,
+    DocstringField,
     DocstringReturn,
     DocstringSection,
     DocstringSectionArguments,
+    DocstringSectionFields,
     DocstringSectionReturns,
 )
 from mkdocstrings_handlers.graphql._internal.enum import Kind
@@ -119,6 +121,21 @@ class InputObjectTypeNode(Node):
 
     description: str
     fields: list[Input]
+
+    @property
+    def docstring(self) -> Sequence[DocstringSection]:
+        return [
+            DocstringSectionFields(
+                value=[
+                    DocstringField(
+                        name=field.name,
+                        description=field.description,
+                        annotation=field.type.render,
+                    )
+                    for field in self.fields
+                ]
+            ),
+        ]
 
 
 @dataclass

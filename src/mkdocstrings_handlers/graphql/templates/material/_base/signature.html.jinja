@@ -5,7 +5,7 @@ It iterates over the arguments of the operation to rebuild the signature.
 The signature is the list of arguments of an operation, including their names and annotations.
 
 Context:
-    operation (OperationTypeDefinition): The operation to render.
+    gql_operation (OperationTypeDefinition): The operation to render.
     config (dict): The configuration options.
 -#}
 
@@ -13,6 +13,7 @@ Context:
     {#- Logging block. -#}
     {{ log.debug("Rendering signature") }}
 {%- endblock logs -%}
+
 {%- with -%}
     {%- set ns = namespace(
         has_pos_only=False,
@@ -22,7 +23,7 @@ Context:
         default=False,
     ) -%}
     {{ "(\n" }}
-    {%- for argument in operation.arguments -%}
+    {%- for argument in gql_operation.arguments -%}
         {#- Prepare type annotation -#}
         {%- with expression = argument.type -%}
             {%- set ns.type -%}: {% with backlink_type = "used-by" -%}
@@ -43,10 +44,10 @@ Context:
 
     {#- Render return type -#}
     : {% if config.signature_crossrefs -%}
-        {%- with expression = operation.type, backlink_type = "returned-by" -%}
+        {%- with expression = gql_operation.type, backlink_type = "returned-by" -%}
             {%- include "expression.html.jinja" with context -%}
         {%- endwith -%}
     {%- else -%}
-        {{ operation.type.render|safe }}
+        {{ gql_operation.type.render|safe }}
     {%- endif -%}
 {%- endwith -%}

@@ -1,0 +1,35 @@
+{#- Template for "Arguments" sections in docstrings.
+
+Renders a list of documented arguments.
+
+Context:
+    section (DocstringSectionArguments): The section to render.
+-#}
+
+{% block logs scoped %}
+    {#- Logging block. -#}
+    {{ log.debug("Rendering arguments section.") }}
+{% endblock logs %}
+
+{% block table_style scoped %}
+    <p><span class="doc-section-title">{{ section.title or "Arguments:" }}</span></p>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for argument in section.value %}
+                <tr class="doc-section-item">
+                    <td>{{ argument.name }}</td>
+                    <td>{{ argument.annotation }}</td>
+                    <td>{{ argument.description }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock table_style %}
+

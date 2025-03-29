@@ -1,0 +1,81 @@
+{#- Template for GraphQL objects.
+
+This template renders a GraphQL object.
+
+Context:
+    gql_object (InputObjectTypeNode | ObjectTypeNode): The object to render.
+    root (bool): Whether this is the root object, injected with `:::` in a
+        Markdown page.
+    heading_level (int): The HTML heading level to use.
+    config (dict): The configuration options.
+-#}
+
+{% block logs scoped %}
+    {#- Logging block. -#}
+    {{ log.debug("Rendering " + gql_object.path) }}
+{% endblock %}
+
+<div class="doc doc-object doc-gql-object">
+    {% with obj = gql_object, html_id = gql_object.path, all_fields = gql_object.fields %}
+        {% if root %}
+            {% set show_full_path = config.show_root_full_path %}
+            {% set root_members = True %}
+        {% elif root_members %}
+            {% set show_full_path = config.show_root_members_full_path or config.show_node_full_path %}
+            {% set root_members = False %}
+        {% else %}
+            {% set show_full_path = config.show_node_full_path %}
+        {% endif %}
+
+        {% set gql_object_name = gql_object.path if show_full_path else gql_object.name %}
+
+        {% if not root or config.show_root_heading %}
+            {% filter heading(
+                heading_level,
+                role="gql_object",
+                id=html_id,
+                class="doc doc-heading",
+                toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-gql-object"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + gql_object.name,
+            ) %}
+                {% block heading scoped %}
+                    {#- Heading block.
+
+                    Renders the heading for the object.
+                    -#}
+                    {% if config.show_symbol_type_heading %}<code class="doc-symbol doc-symbol-heading doc-symbol-gql-object"></code>{% endif %}
+                    <span class="doc doc-gql-object-name">{{ config.heading if config.heading and root else gql_object_name }}</span>
+                {% endblock heading %}
+            {% endfilter %}
+
+        {% else %}
+            {% if config.show_root_toc_entry %}
+                {% filter heading(
+                    heading_level,
+                    role="gql_object",
+                    id=html_id,
+                    toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-gql-object"></code>&nbsp;'|safe if config.show_symbolf_type_toc else '') + (config.toc_label if config.toc_label and root else gql_object.name),
+                    hidden=True,
+                ) %}
+                {% endfilter %}
+            {% endif %}
+            {% set heading_level = heading_level - 1 %}
+        {% endif %}
+
+        <div class="doc doc-contents {% if root %}first{% endif %}">
+            {% block contents scoped %}
+                {#- Contents block.
+
+                Renders the contents of the object. It contains other blocks
+                that the user can override. Override the contents block allows
+                to rearrange the order of the blocks.
+                -#}
+                {% block docstring scoped %}
+                    {#- Docstring block. -#}
+                    {% with docstring_sections = gql_object.docstring %}
+                        {% include "docstring.html.jinja" %}
+                    {% endwith %}
+                {% endblock %}
+            {% endblock contents %}
+        </div>
+    {% endwith %}
+</div>

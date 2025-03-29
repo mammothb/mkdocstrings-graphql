@@ -29,6 +29,10 @@ class DocstringArgument(DocstringNamedElement):
     pass
 
 
+class DocstringField(DocstringNamedElement):
+    pass
+
+
 class DocstringReturn(DocstringElement):
     pass
 
@@ -48,15 +52,23 @@ class DocstringSectionArguments(DocstringSection):
     kind: ClassVar[DocstringSectionKind] = DocstringSectionKind.ARGUMENTS
 
     def __init__(
-        self, *args: Any, value: list[DocstringArgument], **kwargs: Any
+        self, value: list[DocstringArgument], title: str | None = None
     ) -> None:
-        super().__init__(*args, **kwargs)
+        super().__init__(title)
         self.value: list[DocstringArgument] = value
+
+
+class DocstringSectionFields(DocstringSection):
+    kind: ClassVar[DocstringSectionKind] = DocstringSectionKind.FIELDS
+
+    def __init__(self, value: list[DocstringField], title: str | None = None) -> None:
+        super().__init__(title)
+        self.value: list[DocstringField] = value
 
 
 class DocstringSectionReturns(DocstringSection):
     kind: ClassVar[DocstringSectionKind] = DocstringSectionKind.RETURNS
 
-    def __init__(self, *args: Any, value: list[DocstringReturn], **kwargs: Any) -> None:
-        super().__init__(*args, **kwargs)
+    def __init__(self, value: list[DocstringReturn], title: str | None = None) -> None:
+        super().__init__(title)
         self.value: list[DocstringReturn] = value

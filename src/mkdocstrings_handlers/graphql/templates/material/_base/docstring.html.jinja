@@ -3,7 +3,7 @@
 Renders GraphQL docstrings.
 
 Context:
-    docstrings_sections (list[DocstringSection]): The list of docstring
+    docstring_sections (list[DocstringSection]): The list of docstring
         sections.
     config (dict): The configuration dictionary.
     heading_level (int): The heading level to use for Markdown conversion.
@@ -18,6 +18,8 @@ Context:
     {% for section in docstring_sections %}
         {% if config.show_docstring_arguments and section.kind.value == "arguments" %}
             {% include "docstring/arguments.html.jinja" %}
+        {% elif config.show_docstring_fields and section.kind.value == "fields" %}
+            {% include "docstring/fields.html.jinja" %}
         {% endif %}
     {% endfor %}
 {% endif %}
