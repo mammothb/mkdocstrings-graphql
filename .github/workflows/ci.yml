@@ -77,7 +77,6 @@ jobs:
         - "3.11"
         - "3.12"
         - "3.13"
-        - "3.14"
         resolution:
         - highest
         - lowest-direct
@@ -87,7 +86,6 @@ jobs:
         - os: windows-latest
           resolution: lowest-direct
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.python-version == '3.14' }}
 
     steps:
     - name: Checkout
