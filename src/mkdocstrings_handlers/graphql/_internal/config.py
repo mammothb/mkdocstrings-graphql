@@ -105,30 +105,6 @@ class GraphQLInputOptions:
         ),
     ] = 2
 
-    show_docstring_arguments: Annotated[
-        bool,
-        _Field(
-            group="docstrings",
-            description="Whether to display the 'Arguments' section in the object's docstring.",
-        ),
-    ] = True
-
-    show_docstring_enum_values: Annotated[
-        bool,
-        _Field(
-            group="docstrings",
-            description="Whether to display the 'Enum values' section in the object's docstring.",
-        ),
-    ] = True
-
-    show_docstring_fields: Annotated[
-        bool,
-        _Field(
-            group="docstrings",
-            description="Whether to display the 'Fields' section in the object's docstring.",
-        ),
-    ] = True
-
     show_node_full_path: Annotated[
         bool,
         _Field(

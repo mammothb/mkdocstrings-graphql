@@ -86,3 +86,11 @@ class DocstringSectionReturns(DocstringSection):
     def __init__(self, value: list[DocstringReturn], title: str | None = None) -> None:
         super().__init__(title)
         self.value: list[DocstringReturn] = value
+
+
+class DocstringSectionText(DocstringSection):
+    kind: ClassVar[DocstringSectionKind] = DocstringSectionKind.TEXT
+
+    def __init__(self, value: str, title: str | None = None) -> None:
+        super().__init__(title)
+        self.value: str = value

@@ -15,12 +15,15 @@ Context:
         {#- Logging block. -#}
         {{ log.debug("Rendering docstring") }}
     {% endblock logs %}
+
     {% for section in docstring_sections %}
-        {% if config.show_docstring_arguments and section.kind.value == "arguments" %}
+        {% if section.kind.value == "text" %}
+            {{ section.value|convert_markdown(heading_level, html_id) }}
+        {% elif section.kind.value == "arguments" %}
             {% include "docstring/arguments.html.jinja" %}
-        {% elif config.show_docstring_enum_values and section.kind.value == "enum_values" %}
+        {% elif section.kind.value == "enum_values" %}
             {% include "docstring/enum_values.html.jinja" %}
-        {% elif config.show_docstring_fields and section.kind.value == "fields" %}
+        {% elif section.kind.value == "fields" %}
             {% include "docstring/fields.html.jinja" %}
         {% endif %}
     {% endfor %}

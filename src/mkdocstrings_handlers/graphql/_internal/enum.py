@@ -11,6 +11,7 @@ class DocstringSectionKind(StrEnum):
     ENUM_VALUES = "enum_values"
     FIELDS = "fields"
     RETURNS = "returns"
+    TEXT = "text"
 
 
 class Kind(StrEnum):

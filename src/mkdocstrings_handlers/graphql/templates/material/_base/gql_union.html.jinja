@@ -1,0 +1,84 @@
+{#- Template for GraphQL unions.
+
+Renders a GraphQL union.
+
+Context:
+    gql_union (UnionTypeNode): The union to render.
+    root (bool): Whether this is the root object, injected with `:::` in a
+        Markdown page.
+    heading_level (int): The HTML heading level to use.
+    config (dict): The configuration options.
+-#}
+
+{% block logs scoped %}
+    {#- Logging block. -#}
+    {{ log.debug("Rendering " + gql_union.path) }}
+{% endblock logs %}
+
+<div class="doc doc-object doc-gql-union">
+    {% with obj = gql_union, html_id = gql_union.path %}
+        {% if root %}
+            {% set show_full_path = config.show_root_full_path %}
+            {% set root_members = True %}
+        {% elif root_members %}
+            {% set show_full_path = config.show_root_root_members_full_path or config.show_node_full_path %}
+            {% set root_members = False %}
+        {% else %}
+            {% set show_full_path = config.show_node_full_path %}
+        {% endif %}
+
+        {% set gql_union_name = gql_union.path if show_full_path else gql_union.name %}
+
+        {% if not root or config.show_root_heading %}
+            {% filter heading(
+                    heading_level,
+                    role="gql_union",
+                    id=html_id,
+                    class="doc doc-heading",
+                    toc_label=gql_union.name,
+                ) %}
+
+                {% block heading scoped %}
+                    {#- Heading block. -#}
+                    <span class="doc doc-object-name doc-gql-union-name">{{ config.heading if config.heading and root else gql_union_name }}</span>
+                {% endblock heading %}
+            {% endfilter %}
+
+        {% else %}
+
+            {% if config.show_root_toc_entry %}
+                {% filter heading(
+                        heading_level,
+                        role="gql_union",
+                        id=html_id,
+                        toc_label=config.toc_label if config.toc_label and root else gql_union.name,
+                        hidden=True,
+                    ) %}
+                {% endfilter %}
+            {% endif %}
+            {% set heading_level = heading_level - 1 %}
+        {% endif %}
+
+        <div class="doc doc-contents {% if root %}first{% endif %}">
+            {% block types scoped %}
+                {#- Union types block. -#}
+                <p class="doc doc-union-types">
+                    Types: {% for expression in gql_union.types -%}
+                        <code>
+                            {%- with backlink_type = "union-of" -%}
+                                {%- include "expression.html.jinja" -%}
+                            {%- endwith -%}
+                        </code>{% if not loop.last %}, {% endif %}
+                    {% endfor -%}
+                </p>
+            {% endblock types %}
+
+            {% block docstring scoped %}
+                {#- Docstring block. -#}
+                {% with docstring_sections = gql_union.docstring %}
+                    {% include "docstring.html.jinja" %}
+                {% endwith %}
+            {% endblock docstring %}
+        </div>
+    {% endwith %}
+</div>

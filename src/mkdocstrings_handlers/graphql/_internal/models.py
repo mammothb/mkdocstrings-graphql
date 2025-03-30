@@ -13,6 +13,7 @@ from mkdocstrings_handlers.graphql._internal.docstring_models import (
     DocstringSectionEnumValues,
     DocstringSectionFields,
     DocstringSectionReturns,
+    DocstringSectionText,
 )
 from mkdocstrings_handlers.graphql._internal.enum import Kind
 
@@ -117,12 +118,13 @@ class EnumTypeNode(Node):
     @property
     def docstring(self) -> Sequence[DocstringSection]:
         return [
+            DocstringSectionText(value=self.description),
             DocstringSectionEnumValues(
                 value=[
                     DocstringEnumValue(name=value.name, description=value.description)
                     for value in self.values
                 ]
-            )
+            ),
         ]
 
 
@@ -144,6 +146,7 @@ class InputObjectTypeNode(Node):
     @property
     def docstring(self) -> Sequence[DocstringSection]:
         return [
+            DocstringSectionText(value=self.description),
             DocstringSectionFields(
                 value=[
                     DocstringField(
@@ -167,6 +170,7 @@ class ObjectTypeNode(Node):
     @property
     def docstring(self) -> Sequence[DocstringSection]:
         return [
+            DocstringSectionText(value=self.description),
             DocstringSectionFields(
                 value=[
                     DocstringField(
@@ -191,6 +195,7 @@ class OperationTypeNode(Node):
     @property
     def docstring(self) -> Sequence[DocstringSection]:
         return [
+            DocstringSectionText(value=self.description),
             DocstringSectionArguments(
                 value=[
                     DocstringArgument(
@@ -220,3 +225,7 @@ class UnionTypeNode(Node):
 
     description: str
     types: list[str]
+
+    @property
+    def docstring(self) -> Sequence[DocstringSection]:
+        return [DocstringSectionText(value=self.description)]
