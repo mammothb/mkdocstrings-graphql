@@ -5,10 +5,12 @@ from typing import TYPE_CHECKING, Any, ClassVar
 
 from mkdocstrings_handlers.graphql._internal.docstring_models import (
     DocstringArgument,
+    DocstringEnumValue,
     DocstringField,
     DocstringReturn,
     DocstringSection,
     DocstringSectionArguments,
+    DocstringSectionEnumValues,
     DocstringSectionFields,
     DocstringSectionReturns,
 )
@@ -47,6 +49,12 @@ class Annotation:
         if self.non_null_list:
             rendered = f"{rendered}!"
         return rendered
+
+
+@dataclass
+class EnumValue:
+    name: str
+    description: str
 
 
 @dataclass
@@ -104,7 +112,18 @@ class EnumTypeNode(Node):
     kind: ClassVar[Kind] = Kind.ENUM
 
     description: str
-    values: list[str]
+    values: list[EnumValue]
+
+    @property
+    def docstring(self) -> Sequence[DocstringSection]:
+        return [
+            DocstringSectionEnumValues(
+                value=[
+                    DocstringEnumValue(name=value.name, description=value.description)
+                    for value in self.values
+                ]
+            )
+        ]
 
 
 @dataclass
@@ -144,6 +163,21 @@ class ObjectTypeNode(Node):
 
     description: str
     fields: list[Field]
+
+    @property
+    def docstring(self) -> Sequence[DocstringSection]:
+        return [
+            DocstringSectionFields(
+                value=[
+                    DocstringField(
+                        name=field.name,
+                        description=field.description,
+                        annotation=field.type.render,
+                    )
+                    for field in self.fields
+                ]
+            ),
+        ]
 
 
 @dataclass

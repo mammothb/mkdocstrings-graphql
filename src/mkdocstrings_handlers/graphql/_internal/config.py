@@ -113,6 +113,14 @@ class GraphQLInputOptions:
         ),
     ] = True
 
+    show_docstring_enum_values: Annotated[
+        bool,
+        _Field(
+            group="docstrings",
+            description="Whether to display the 'Enum values' section in the object's docstring.",
+        ),
+    ] = True
+
     show_docstring_fields: Annotated[
         bool,
         _Field(

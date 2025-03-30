@@ -8,6 +8,7 @@ else:
 
 class DocstringSectionKind(StrEnum):
     ARGUMENTS = "arguments"
+    ENUM_VALUES = "enum_values"
     FIELDS = "fields"
     RETURNS = "returns"
 

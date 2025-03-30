@@ -13,7 +13,7 @@ Context:
 {% block logs scoped %}
     {#- Logging block. -#}
     {{ log.debug("Rendering " + gql_object.path) }}
-{% endblock %}
+{% endblock logs %}
 
 <div class="doc doc-object doc-gql-object">
     {% with obj = gql_object, html_id = gql_object.path, all_fields = gql_object.fields %}
@@ -31,18 +31,17 @@ Context:
 
         {% if not root or config.show_root_heading %}
             {% filter heading(
-                heading_level,
-                role="gql_object",
-                id=html_id,
-                class="doc doc-heading",
-                toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-gql-object"></code>&nbsp;'|safe if config.show_symbol_type_toc else '') + gql_object.name,
-            ) %}
+                    heading_level,
+                    role="gql_object",
+                    id=html_id,
+                    class="doc doc-heading",
+                    toc_label=gql_object.name,
+                ) %}
                 {% block heading scoped %}
                     {#- Heading block.
 
                     Renders the heading for the object.
                     -#}
-                    {% if config.show_symbol_type_heading %}<code class="doc-symbol doc-symbol-heading doc-symbol-gql-object"></code>{% endif %}
                     <span class="doc doc-gql-object-name">{{ config.heading if config.heading and root else gql_object_name }}</span>
                 {% endblock heading %}
             {% endfilter %}
@@ -50,12 +49,12 @@ Context:
         {% else %}
             {% if config.show_root_toc_entry %}
                 {% filter heading(
-                    heading_level,
-                    role="gql_object",
-                    id=html_id,
-                    toc_label=('<code class="doc-symbol doc-symbol-toc doc-symbol-gql-object"></code>&nbsp;'|safe if config.show_symbolf_type_toc else '') + (config.toc_label if config.toc_label and root else gql_object.name),
-                    hidden=True,
-                ) %}
+                        heading_level,
+                        role="gql_object",
+                        id=html_id,
+                        toc_label=config.toc_label if config.toc_label and root else gql_object.name,
+                        hidden=True,
+                    ) %}
                 {% endfilter %}
             {% endif %}
             {% set heading_level = heading_level - 1 %}

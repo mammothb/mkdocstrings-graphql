@@ -29,6 +29,10 @@ class DocstringArgument(DocstringNamedElement):
     pass
 
 
+class DocstringEnumValue(DocstringNamedElement):
+    pass
+
+
 class DocstringField(DocstringNamedElement):
     pass
 
@@ -56,6 +60,16 @@ class DocstringSectionArguments(DocstringSection):
     ) -> None:
         super().__init__(title)
         self.value: list[DocstringArgument] = value
+
+
+class DocstringSectionEnumValues(DocstringSection):
+    kind: ClassVar[DocstringSectionKind] = DocstringSectionKind.ENUM_VALUES
+
+    def __init__(
+        self, value: list[DocstringEnumValue], title: str | None = None
+    ) -> None:
+        super().__init__(title)
+        self.value: list[DocstringEnumValue] = value
 
 
 class DocstringSectionFields(DocstringSection):

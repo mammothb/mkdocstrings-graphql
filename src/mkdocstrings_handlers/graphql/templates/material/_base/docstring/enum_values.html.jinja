@@ -1,0 +1,32 @@
+{#- Template for "Enum values" section in docstrings.
+
+Renders a list of enum values.
+
+Context:
+    section (DocstringSectionEnumValues): The section to render
+-#}
+
+{% block logs scoped %}
+    {#- Logging block. -#}
+    {{ log.debug("Rendering enum values section.") }}
+{% endblock logs %}
+
+{% block table_style scoped %}
+    <p><span class="doc-section-title">{{ section.title or "Enum values:" }}</span></p>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for enum_value in section.value %}
+                <tr class="doc-section-item">
+                    <td>{{ enum_value.name }}</td>
+                    <td>{{ enum_value.description }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock table_style %}

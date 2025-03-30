@@ -9,6 +9,7 @@ from mkdocstrings import get_logger
 from graphql.error.syntax_error import GraphQLSyntaxError
 from graphql.language.ast import (
     EnumTypeDefinitionNode,
+    EnumValueDefinitionNode,
     FieldDefinitionNode,
     InputObjectTypeDefinitionNode,
     InputValueDefinitionNode,
@@ -29,6 +30,7 @@ from mkdocstrings_handlers.graphql._internal.error import GraphQLFileSyntaxError
 from mkdocstrings_handlers.graphql._internal.models import (
     Annotation,
     EnumTypeNode,
+    EnumValue,
     Field,
     Input,
     InputObjectTypeNode,
@@ -120,7 +122,7 @@ class Loader:
             name=name,
             path=f"{schema_name}.{name}",
             description=self._parse_description(node.description),
-            values=[value_node.name.value for value_node in node.values],
+            values=self._parse_enum_values(node.values),
         )
 
     def _load_input(
@@ -197,36 +199,45 @@ class Loader:
             types=[type_node.name.value for type_node in node.types],
         )
 
-    def _parse_fields(
-        self, field_nodes: tuple[FieldDefinitionNode, ...]
-    ) -> list[Field]:
+    def _parse_enum_values(
+        self, nodes: tuple[EnumValueDefinitionNode, ...]
+    ) -> list[EnumValue]:
         return [
-            Field(
-                name=field_node.name.value,
-                description=self._parse_description(field_node.description),
-                type=self._parse_type(field_node.type),
+            EnumValue(
+                name=node.name.value,
+                description=self._parse_description(node.description),
             )
-            for field_node in field_nodes
+            for node in nodes
         ]
 
-    def _parse_description(self, string_node: StringValueNode | None) -> str:
-        return string_node.value if string_node is not None else ""
+    def _parse_fields(self, nodes: tuple[FieldDefinitionNode, ...]) -> list[Field]:
+        return [
+            Field(
+                name=node.name.value,
+                description=self._parse_description(node.description),
+                type=self._parse_type(node.type),
+            )
+            for node in nodes
+        ]
+
+    def _parse_description(self, node: StringValueNode | None) -> str:
+        return node.value if node is not None else ""
 
     def _parse_input_values(
-        self, field_nodes: tuple[InputValueDefinitionNode, ...]
+        self, nodes: tuple[InputValueDefinitionNode, ...]
     ) -> list[Input]:
         return [
             Input(
-                name=field_node.name.value,
-                description=self._parse_description(field_node.description),
-                type=self._parse_type(field_node.type),
+                name=node.name.value,
+                description=self._parse_description(node.description),
+                type=self._parse_type(node.type),
             )
-            for field_node in field_nodes
+            for node in nodes
         ]
 
     def _parse_type(
         self,
-        type_node: TypeNode,
+        node: TypeNode,
         *,
         non_null: bool = False,
         is_list: bool = False,
@@ -237,36 +248,36 @@ class Loader:
         The following combinations are possible:
         BaseType, BaseType!, [BaseType], [BaseType!], [BaseType]!, [BaseType!]!
         """
-        if type(type_node) is NonNullTypeNode:
-            if type(type_node.type) is ListTypeNode:
+        if type(node) is NonNullTypeNode:
+            if type(node.type) is ListTypeNode:
                 return self._parse_type(
-                    type_node.type,
+                    node.type,
                     non_null=non_null,
                     is_list=is_list,
                     non_null_list=True,
                 )
             return self._parse_type(
-                type_node.type,
+                node.type,
                 non_null=True,
                 is_list=is_list,
                 non_null_list=non_null_list,
             )
 
-        if type(type_node) is ListTypeNode:
+        if type(node) is ListTypeNode:
             return self._parse_type(
-                type_node.type,
+                node.type,
                 non_null=non_null,
                 is_list=True,
                 non_null_list=non_null_list,
             )
-        if type(type_node) is NamedTypeNode:
+        if type(node) is NamedTypeNode:
             return Annotation(
-                name=type_node.name.value,
+                name=node.name.value,
                 non_null=non_null,
                 is_list=is_list,
                 non_null_list=non_null_list,
             )
-        raise ValueError(f"Unknown type {type_node.to_dict()}")
+        raise ValueError(f"Unknown type {node.to_dict()}")
 
     def _read_graph_file(self, path: Path) -> str:
         with open(path, encoding="utf-8") as f:

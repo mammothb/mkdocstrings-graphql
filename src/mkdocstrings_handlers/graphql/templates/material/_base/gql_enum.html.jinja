@@ -1,0 +1,72 @@
+{#- Template for GraphQL enums.
+
+Renders a GraphQL enum.
+
+Context:
+    gql_enum (EnumTypeNode): The enum to render.
+    root (bool): Whether this the root object, injected with `:::` in a Markdown
+        page.
+    heading_level (int): The HTML heading level to use.
+    config (dict): The configuration options.
+-#}
+
+{% block logs scoped %}
+    {#- Logging block. -#}
+    {{ log.debug("Rendering " + gql_enum.path) }}
+{% endblock logs %}
+
+<div class="doc doc-object doc-gql-enum">
+    {% with obj = gql_enum, html_id = gql_enum.path %}
+        {% if root %}
+            {% set show_full_path = config.show_root_full_path %}
+            {% set root_members = True %}
+        {% elif root_members %}
+            {% set show_full_path = config.show_root_members_full_path or config.show_enum_full_path %}
+            {% set root_members = False %}
+        {% else %}
+            {% set show_full_path = config.show_enum_full_path %}
+        {% endif %}
+
+        {% set gql_enum_name = gql_enum.path if show_full_path else gql_enum.name %}
+
+        {% if not root or config.show_root_heading %}
+            {% filter heading(
+                    heading_level,
+                    role="gql_enum",
+                    id=html_id,
+                    class="doc doc-heading",
+                    toc_label=gql_enum.name,
+                ) %}
+
+                {% block heading scoped %}
+                    {#- Heading block -#}
+                    <span class="doc doc-object-name doc-gql-enum-name">{{ config.heading if config.heading and root else gql_enum_name }}</span>
+                {% endblock heading %}
+            {% endfilter %}
+
+        {% else %}
+
+            {% if config.show_root_toc_entry %}
+                {% filter heading(
+                        heading_level,
+                        role="gql_enum",
+                        id=html_id,
+                        toc_label=config.toc_label if config.toc_label and root else gql_enum.name,
+                        hidden=True,
+                    ) %}
+                {% endfilter %}
+            {% endif %}
+            {% set heading_level = heading_level - 1 %}
+        {% endif %}
+
+        <div class="doc doc-contents {% if root %}first{% endif %}">
+            {% block docstring scoped %}
+                {#- Docstring block. -#}
+                {% with docstring_sections = gql_enum.docstring %}
+                    {% include "docstring.html.jinja" %}
+                {% endwith %}
+            {% endblock docstring %}
+        </div>
+    {% endwith %}
+</div>
+
