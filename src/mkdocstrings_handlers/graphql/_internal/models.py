@@ -218,6 +218,10 @@ class ScalarTypeNode(Node):
 
     description: str
 
+    @property
+    def docstring(self) -> Sequence[DocstringSection]:
+        return [DocstringSectionText(value=self.description)]
+
 
 @dataclass
 class UnionTypeNode(Node):

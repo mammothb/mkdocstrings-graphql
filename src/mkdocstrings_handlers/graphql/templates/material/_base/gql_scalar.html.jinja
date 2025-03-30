@@ -1,0 +1,73 @@
+{#- Template for GraphQL scalars.
+
+Renders a GraphQL scalar.
+
+Context:
+    gql_scalar (ScalarTypeNode): The scalar to render.
+    root (bool): Whether this the root object, injected with `:::` in a Markdown
+        page.
+    heading_level (int): The HTML heading level to use.
+    config (dict): The configuration options.
+-#}
+
+{% block logs scoped %}
+    {#- Logging block. -#}
+    {{ log.debug("Rendering " + gql_scalar.path) }}
+{% endblock logs %}
+
+<div class="doc doc-object doc-gql-scalar">
+    {% with obj = gql_scalar, html_id = gql_scalar.path %}
+        {% if root %}
+            {% set show_full_path = config.show_root_full_path %}
+            {% set root_members = True %}
+        {% elif root_members %}
+            {% set show_full_path = config.show_root_members_full_path or config.show_scalar_full_path %}
+            {% set root_members = False %}
+        {% else %}
+            {% set show_full_path = config.show_scalar_full_path %}
+        {% endif %}
+
+        {% set gql_scalar_name = gql_scalar.path if show_full_path else gql_scalar.name %}
+
+        {% if not root or config.show_root_heading %}
+            {% filter heading(
+                    heading_level,
+                    role="gql_scalar",
+                    id=html_id,
+                    class="doc doc-heading",
+                    toc_label=gql_scalar.name,
+                ) %}
+
+                {% block heading scoped %}
+                    {#- Heading block -#}
+                    <span class="doc doc-object-name doc-gql-scalar-name">{{ config.heading if config.heading and root else gql_scalar_name }}</span>
+                {% endblock heading %}
+            {% endfilter %}
+
+        {% else %}
+
+            {% if config.show_root_toc_entry %}
+                {% filter heading(
+                        heading_level,
+                        role="gql_scalar",
+                        id=html_id,
+                        toc_label=config.toc_label if config.toc_label and root else gql_scalar.name,
+                        hidden=True,
+                    ) %}
+                {% endfilter %}
+            {% endif %}
+            {% set heading_level = heading_level - 1 %}
+        {% endif %}
+
+        <div class="doc doc-contents {% if root %}first{% endif %}">
+            {% block docstring scoped %}
+                {#- Docstring block. -#}
+                {% with docstring_sections = gql_scalar.docstring %}
+                    {% include "docstring.html.jinja" %}
+                {% endwith %}
+            {% endblock docstring %}
+        </div>
+    {% endwith %}
+</div>
+
+
