@@ -156,7 +156,6 @@ convention = "google"
 [dependency-groups]
 maintain = [
     "build>=1.2",
-    "git-changelog>=2.5",
     "twine>=5.1",
 ]
 ci = [
