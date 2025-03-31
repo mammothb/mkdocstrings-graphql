@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from jinja2.utils import pass_context
 from markupsafe import Markup
@@ -38,21 +38,18 @@ def format_signature(
         new_context = context.parent
     else:
         new_context = dict(context.parent)
-        new_context["config"] = replace(
-            new_context["config"], show_signature_annotations=annotations
-        )
+        new_context["config"] = replace(new_context["config"], show_signature_annotations=annotations)
 
     signature = template.render(new_context, operation=operation, signature=True)
     signature = _format_signature(callable_path, signature)
-    return str(
-        env.filters["highlight"](
-            Markup.escape(signature),
-            language="graphql",
-            inline=False,
-            classes=["doc-signature"],
-            linenums=False,
-        )
-    )
+    highlight_kwargs: dict[str, Any] = {
+        "src": Markup.escape(signature),
+        "language": "graphql",
+        "inline": False,
+        "linenums": False,
+        "classes": ["doc-signature"],
+    }
+    return str(env.filters["highlight"](**highlight_kwargs))  # pyright:ignore[reportCallIssue]
 
 
 def get_template(node: Node) -> str:

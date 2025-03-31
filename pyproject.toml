@@ -53,10 +53,14 @@ typeCheckingMode = "recommended"
 reportAny = "none"
 reportExplicitAny = "none"
 reportUnusedCallResult = "none"
+reportUnknownArgumentType = "none"
+reportUnknownMemberType = "none"
+reportUnknownVariableType = "none"
+reportUntypedClassDecorator = "none"
 
 executionEnvironments = [
     { root = "src" },
-    { root = "tests", reportAttributeAccessIssue = "none", reportPrivateUsage = "none", reportUnknownArgumentType = "none", reportUnknownMemberType = "none", reportUnknownVariableType = "none" }
+    { root = "tests", reportAttributeAccessIssue = "none", reportPrivateUsage = "none"  }
 ]
 
 [tool.pdm.version]

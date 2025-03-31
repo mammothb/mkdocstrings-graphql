@@ -1,9 +1,15 @@
 from __future__ import annotations
 
+import sys
 from typing import TYPE_CHECKING, final
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+if sys.version_info >= (3, 12):
+    from typing import override
+else:
+    from typing_extensions import override
 
 
 @final
@@ -12,6 +18,7 @@ class GraphQLFileSyntaxError(Exception):
         super().__init__()
         self.message = self.format_message(path, message)
 
+    @override
     def __str__(self) -> str:
         return self.message
 
