@@ -40,7 +40,7 @@ jobs:
       - name: Check the code quality
         run: uv run ruff check src tests
       - name: Check if the code is correctly typed
-        run: make check-types
+        run: uv run basedpyright
       - name: Check for breaking changes in the API
         run: make check-api
       - name: Store objects inventory for tests
