@@ -14,15 +14,13 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from mkdocs import config
-    from mkdocstrings.plugin import MkdocstringsPlugin
+    from mkdocstrings import MkdocstringsPlugin
 
     from mkdocstrings_handlers.graphql import GraphQLHandler
 
 
 @pytest.fixture(name="mkdocs_conf")
-def fixture_mkdocs_conf(
-    request: pytest.FixtureRequest, tmp_path: Path
-) -> Iterator[config.Config]:
+def mkdocs_conf_fixture(request: pytest.FixtureRequest, tmp_path: Path) -> Iterator[config.Config]:
     """Yield a MkDocs configuration object.
 
     Parameters:
@@ -32,16 +30,14 @@ def fixture_mkdocs_conf(
     Yields:
         MkDocs config.
     """
-    while hasattr(request, "_parent_request") and hasattr(
-        request._parent_request, "_parent_request"
-    ):
+    while hasattr(request, "_parent_request") and hasattr(request._parent_request, "_parent_request"):
         request = request._parent_request
 
     params = getattr(request, "param", {})
     plugins = params.pop("plugins", [{"mkdocstrings": {}}])
 
     conf = MkDocsConfig()
-    conf_dict = {
+    conf_dict: dict[str, Any] = {
         "site_name": "foo",
         "site_url": "https://example.org/",
         "site_dir": str(tmp_path),
@@ -49,9 +45,7 @@ def fixture_mkdocs_conf(
         **getattr(request, "param", {}),
     }
     # Re-create it manually as a workaround for https://github.com/mkdocs/mkdocs/issues/2289
-    mdx_configs: dict[str, Any] = dict(
-        ChainMap(*conf_dict.get("markdown_extensions", []))
-    )
+    mdx_configs: dict[str, Any] = dict(ChainMap(*conf_dict.get("markdown_extensions", [])))
 
     conf.load_dict(conf_dict)
     assert conf.validate() == ([], [])
@@ -66,7 +60,7 @@ def fixture_mkdocs_conf(
 
 
 @pytest.fixture(name="plugin")
-def fixture_plugin(mkdocs_conf: config.Config) -> MkdocstringsPlugin:
+def plugin_fixture(mkdocs_conf: config.Config) -> MkdocstringsPlugin:
     """Return a plugin instance.
 
     Parameters:
@@ -79,7 +73,7 @@ def fixture_plugin(mkdocs_conf: config.Config) -> MkdocstringsPlugin:
 
 
 @pytest.fixture(name="ext_markdown")
-def fixture_ext_markdown(mkdocs_conf: config.Config) -> Markdown:
+def ext_markdown_fixture(mkdocs_conf: config.Config) -> Markdown:
     """Return a Markdown instance with MkdocstringsExtension.
 
     Parameters:
@@ -95,9 +89,7 @@ def fixture_ext_markdown(mkdocs_conf: config.Config) -> Markdown:
 
 
 @pytest.fixture(name="handler")
-def fixture_handler(
-    plugin: MkdocstringsPlugin, ext_markdown: Markdown
-) -> GraphQLHandler:
+def handler_fixture(plugin: MkdocstringsPlugin, ext_markdown: Markdown) -> GraphQLHandler:
     """Return a handler instance.
 
     Parameters:
@@ -108,4 +100,4 @@ def fixture_handler(
     """
     handler = plugin.handlers.get_handler("graphql")
     handler._update_env(ext_markdown)
-    return handler
+    return handler  # pyright:ignore[reportReturnType]

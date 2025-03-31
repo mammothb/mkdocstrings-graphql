@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import glob
 import sys
+from dataclasses import asdict
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, ClassVar, final
 
@@ -24,7 +25,7 @@ if TYPE_CHECKING:
 if sys.version_info >= (3, 11):
     from contextlib import chdir
 else:
-    import os
+    import os  # pyright:ignore[reportUnreachable]
     from contextlib import contextmanager
 
     @contextmanager
@@ -35,6 +36,12 @@ else:
             yield
         finally:
             os.chdir(curr_dir)
+
+
+if sys.version_info >= (3, 12):
+    from typing import override
+else:
+    from typing_extensions import override  # pyright:ignore[reportUnreachable]
 
 
 _logger = get_logger(__name__)
@@ -80,6 +87,7 @@ class GraphQLHandler(BaseHandler):
 
         self._collected: dict[str, CollectorItem] = {}
 
+    @override
     def get_options(self, local_options: Mapping[str, Any]) -> HandlerOptions:
         """Get combined default, global and local options.
 
@@ -90,16 +98,18 @@ class GraphQLHandler(BaseHandler):
             The combined options.
         """
         extra = {
-            **self.global_options.get("extra", {}),
+            **getattr(self.global_options, "extra", {}),
             **local_options.get("extra", {}),
         }
-        options = {**self.global_options, **local_options, "extra": extra}
+        options = {**asdict(self.global_options), **local_options, "extra": extra}
         try:
             return GraphQLOptions.from_data(**options)
         except Exception as error:
-            raise PluginError(f"Invalid options: {error}") from error
+            msg = f"Invalid options: {error}"
+            raise PluginError(msg) from error
 
-    def collect(self, identifier: str, options: GraphQLOptions) -> CollectorItem:  # noqa: ARG002
+    @override
+    def collect(self, identifier: str, options: GraphQLOptions) -> CollectorItem:
         """Collect data given an identifier and selection configuration.
 
         Args:
@@ -110,7 +120,8 @@ class GraphQLHandler(BaseHandler):
             The collected item.
         """
         if not identifier:
-            raise CollectionError("Empty identifier")
+            msg = "Empty identifier"
+            raise CollectionError(msg)
         schema_name, member_path = identifier.split(".", 1)
         unknown_schema = schema_name not in self._schemas_collection
         if unknown_schema:
@@ -121,6 +132,7 @@ class GraphQLHandler(BaseHandler):
             loader.load(schema_name)
         return self._schemas_collection[schema_name][member_path]
 
+    @override
     def render(self, data: CollectorItem, options: GraphQLOptions) -> str:
         """Render the collected data.
 
@@ -142,6 +154,7 @@ class GraphQLHandler(BaseHandler):
             }
         )
 
+    @override
     def get_aliases(self, identifier: str) -> tuple[str, ...]:
         """Get aliases for a given identifier."""
         try:
@@ -151,7 +164,8 @@ class GraphQLHandler(BaseHandler):
         # Update the following code to return the canonical identifier and any aliases.
         return (data.path,)
 
-    def update_env(self, config: dict[str, Any]) -> None:  # noqa: ARG002
+    @override
+    def update_env(self, config: dict[str, Any]) -> None:
         """Update the Jinja environment with any custom settings/filters/options
         for this handler.
 
@@ -161,7 +175,7 @@ class GraphQLHandler(BaseHandler):
         self.env.trim_blocks = True
         self.env.lstrip_blocks = True
         self.env.keep_trailing_newline = False
-        self.env.filters["format_signature"] = render.format_signature
+        self.env.filters["format_signature"] = render.format_signature  # pyright:ignore[reportArgumentType]
 
     # You can also implement the `get_inventory_urls` and `load_inventory` methods
     # if you want to support loading object inventories.
