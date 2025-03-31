@@ -38,7 +38,7 @@ jobs:
           uv venv
           uv sync --no-editable
       - name: Check the code quality
-        run: uv run ruff check src tests --config config/ruff.toml
+        run: uv run ruff check src tests
       - name: Check if the code is correctly typed
         run: make check-types
       - name: Check for breaking changes in the API

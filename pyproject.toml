@@ -45,6 +45,20 @@ Discussions = "https://github.com/mammothb/mkdocstrings-graphql/discussions"
 Gitter = "https://gitter.im/mkdocstrings-graphql/community"
 Funding = "https://github.com/sponsors/mammothb"
 
+[tool.basedpyright]
+include = ["src", "tests"]
+exclude = ["tests/fixtures"]
+typeCheckingMode = "recommended"
+
+reportAny = "none"
+reportExplicitAny = "none"
+reportUnusedCallResult = "none"
+
+executionEnvironments = [
+    { root = "src" },
+    { root = "tests", reportAttributeAccessIssue = "none", reportPrivateUsage = "none", reportUnknownArgumentType = "none", reportUnknownMemberType = "none", reportUnknownVariableType = "none" }
+]
+
 [tool.pdm.version]
 source = "call"
 getter = "scripts.get_version:get_version"
@@ -76,6 +90,55 @@ data = [
     {path = "share/**/*", relative-to = "."},
 ]
 
+[tool.ruff]
+line-length = 120
+target-version = "py39"
+
+[tool.ruff.format]
+exclude = [
+    "tests/fixtures/*.py",
+]
+docstring-code-format = true
+docstring-code-line-length = 80
+
+[tool.ruff.lint]
+exclude = [
+    "tests/fixtures/*.py",
+]
+select = ["ALL"]
+ignore = [
+    "A001",  # Variable is shadowing a Python builtin
+    "ANN204",  # Missing return type annotation for special method __str__
+    "ANN401",  # Dynamically typed expressions (typing.Any) are disallowed
+    "ARG005",  # Unused lambda argument
+    "C901",  # Too complex
+    "COM812", # Trailing comma missing
+    "D105",  # Missing docstring in magic method
+    "D205", # Missing blank line after summary
+    "D417",  # Missing argument description in the docstring
+    "E501",  # Line too long
+    "ERA001",  # Commented out code
+    "G004",  # Logging statement uses f-string
+    "PLR0911",  # Too many return statements
+    "PLR0912",  # Too many branches
+    "PLR0913",  # Too many arguments to function call
+    "PLR0915",  # Too many statements
+    "SLF001", # Private member accessed
+    "TRY003",  # Avoid specifying long messages outside the exception class
+]
+
+[tool.ruff.lint.flake8-quotes]
+docstring-quotes = "double"
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.isort]
+known-first-party = ["mkdocstrings_handlers.graphql"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
 [dependency-groups]
 maintain = [
     "build>=1.2",
@@ -89,9 +152,9 @@ ci = [
     "pytest-cov>=5.0",
     "pytest-randomly>=3.15",
     "pytest-xdist>=3.6",
-    "mypy>=1.10",
     "types-markdown>=3.6",
     "types-pyyaml>=6.0",
+    "basedpyright>=1.28",
 ]
  docs = [
     "markdown-callouts>=0.4",

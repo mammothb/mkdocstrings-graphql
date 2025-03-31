@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture(name="loader", scope="module")
-def _fixture_loader() -> griffe.GriffeLoader:
+def loader_fixture() -> griffe.GriffeLoader:
     loader = griffe.GriffeLoader()
     loader.load("mkdocstrings")
     loader.load("mkdocstrings_handlers.graphql")
@@ -26,13 +26,37 @@ def _fixture_loader() -> griffe.GriffeLoader:
 
 
 @pytest.fixture(name="internal_api", scope="module")
-def _fixture_internal_api(loader: griffe.GriffeLoader) -> griffe.Module:
+def internal_api_fixture(loader: griffe.GriffeLoader) -> griffe.Module:
     return loader.modules_collection["mkdocstrings_handlers.graphql._internal"]
 
 
 @pytest.fixture(name="public_api", scope="module")
-def _fixture_public_api(loader: griffe.GriffeLoader) -> griffe.Module:
+def public_api_fixture(loader: griffe.GriffeLoader) -> griffe.Module:
     return loader.modules_collection["mkdocstrings_handlers.graphql"]
+
+
+@pytest.fixture(name="modulelevel_internal_objects", scope="module")
+def modulelevel_internal_objects_fixture(internal_api: griffe.Module) -> list[griffe.Object | griffe.Alias]:
+    return list(_yield_public_objects(internal_api, modulelevel=True))
+
+
+@pytest.fixture(name="internal_objects", scope="module")
+def internal_objects_fixture(internal_api: griffe.Module) -> list[griffe.Object | griffe.Alias]:
+    return list(_yield_public_objects(internal_api, modulelevel=False, special=True))
+
+
+@pytest.fixture(name="public_objects", scope="module")
+def public_objects_fixture(public_api: griffe.Module) -> list[griffe.Object | griffe.Alias]:
+    return list(_yield_public_objects(public_api, modulelevel=False, inherited=True, special=True))
+
+
+@pytest.fixture(name="inventory", scope="module")
+def inventory_fixture() -> Inventory:
+    inventory_file = Path(__file__).parent.parent / "site" / "objects.inv"
+    if not inventory_file.exists():
+        raise pytest.skip("The objects inventory is not available.")
+    with inventory_file.open("rb") as file:
+        return Inventory.parse_sphinx(file)
 
 
 def _yield_public_objects(
@@ -51,7 +75,7 @@ def _yield_public_objects(
                 if modules:
                     yield member
                 yield from _yield_public_objects(
-                    member,  # type: ignore[arg-type]
+                    member,  # pyright:ignore[reportArgumentType]
                     modules=modules,
                     modulelevel=modulelevel,
                     inherited=inherited,
@@ -63,7 +87,7 @@ def _yield_public_objects(
                 continue
             if member.is_class and not modulelevel:
                 yield from _yield_public_objects(
-                    member,  # type: ignore[arg-type]
+                    member,  # pyright:ignore[reportArgumentType]
                     modules=modules,
                     modulelevel=False,
                     inherited=inherited,
@@ -73,51 +97,13 @@ def _yield_public_objects(
             continue
 
 
-@pytest.fixture(name="modulelevel_internal_objects", scope="module")
-def _fixture_modulelevel_internal_objects(
-    internal_api: griffe.Module,
-) -> list[griffe.Object | griffe.Alias]:
-    return list(_yield_public_objects(internal_api, modulelevel=True))
-
-
-@pytest.fixture(name="internal_objects", scope="module")
-def _fixture_internal_objects(
-    internal_api: griffe.Module,
-) -> list[griffe.Object | griffe.Alias]:
-    return list(_yield_public_objects(internal_api, modulelevel=False, special=True))
-
-
-@pytest.fixture(name="public_objects", scope="module")
-def _fixture_public_objects(
-    public_api: griffe.Module,
-) -> list[griffe.Object | griffe.Alias]:
-    return list(
-        _yield_public_objects(
-            public_api, modulelevel=False, inherited=True, special=True
-        )
-    )
-
-
-@pytest.fixture(name="inventory", scope="module")
-def _fixture_inventory() -> Inventory:
-    inventory_file = Path(__file__).parent.parent / "site" / "objects.inv"
-    if not inventory_file.exists():
-        raise pytest.skip("The objects inventory is not available.")
-    with inventory_file.open("rb") as file:
-        return Inventory.parse_sphinx(file)
-
-
-def test_unique_names(
-    modulelevel_internal_objects: list[griffe.Object | griffe.Alias],
-) -> None:
+def test_unique_names(modulelevel_internal_objects: list[griffe.Object | griffe.Alias]) -> None:
     """All internal objects have unique names."""
-    names_to_paths = defaultdict(list)
+    names_to_paths: dict[str, list[str]] = defaultdict(list)
     for obj in modulelevel_internal_objects:
         names_to_paths[obj.name].append(obj.path)
     non_unique = [paths for paths in names_to_paths.values() if len(paths) > 1]
-    assert not non_unique, "Non-unique names:\n" + "\n".join(
-        str(paths) for paths in non_unique
-    )
+    assert not non_unique, "Non-unique names:\n" + "\n".join(str(paths) for paths in non_unique)
 
 
 def test_single_locations(public_api: griffe.Module) -> None:
@@ -126,26 +112,16 @@ def test_single_locations(public_api: griffe.Module) -> None:
     def _public_path(obj: griffe.Object | griffe.Alias) -> bool:
         return obj.is_public and (obj.parent is None or _public_path(obj.parent))
 
-    multiple_locations = {}
+    multiple_locations: dict[str, list[str]] = {}
     for obj_name in graphql.__all__:
         obj = public_api[obj_name]
         if obj.aliases and (
-            public_aliases := [
-                path
-                for path, alias in obj.aliases.items()
-                if path != obj.path and _public_path(alias)
-            ]
+            public_aliases := [path for path, alias in obj.aliases.items() if path != obj.path and _public_path(alias)]
         ):
             multiple_locations[obj.path] = public_aliases
     assert not multiple_locations, "Multiple public locations:\n" + "\n".join(
         f"{path}: {aliases}" for path, aliases in multiple_locations.items()
     )
-
-
-def _module_or_child(parent: str, name: str) -> bool:
-    parents = [parent[:i] for i, char in enumerate(parent) if char == "."]
-    parents.append(parent)
-    return name in parents or name.startswith(parent + ".")
 
 
 def test_no_module_docstrings_in_internal_api(internal_api: griffe.Module) -> None:
