@@ -4,14 +4,13 @@ build-backend = "pdm.backend"
 
 [project]
 name = "mkdocstrings-graphql"
+version = "0.1.0rc1"
 description = "A GraphQL handler for mkdocstrings."
 authors = [{name = "mmb L"}]
 license = "MIT"
 license-files = ["LICENSE"]
 readme = "README.md"
-requires-python = ">=3.9"
 keywords = []
-dynamic = ["version"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -28,6 +27,7 @@ classifiers = [
     "Topic :: Utilities",
     "Typing :: Typed",
 ]
+requires-python = ">=3.9"
 dependencies = [
     "backports-strenum>=1.3.1 ; python_full_version < '3.11'",
     "graphql-core~=3.2.0",
@@ -37,13 +37,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://mammothb.github.io/mkdocstrings-graphql"
-Documentation = "https://mammothb.github.io/mkdocstrings-graphql"
-Changelog = "https://mammothb.github.io/mkdocstrings-graphql/changelog"
 Repository = "https://github.com/mammothb/mkdocstrings-graphql"
 Issues = "https://github.com/mammothb/mkdocstrings-graphql/issues"
-Discussions = "https://github.com/mammothb/mkdocstrings-graphql/discussions"
-Gitter = "https://gitter.im/mkdocstrings-graphql/community"
 Funding = "https://github.com/sponsors/mammothb"
 
 [tool.basedpyright]
@@ -75,35 +70,17 @@ source = ["src"]
 [tool.coverage.xml]
 output = "coverage.xml"
 
-[tool.pdm.version]
-source = "call"
-getter = "scripts.get_version:get_version"
-
 [tool.pdm.build]
 package-dir = "src"
 includes = ["src/mkdocstrings_handlers"]
 editable-backend = "editables"
 
-# Include as much as possible in the source distribution, to help redistributors.
 excludes = ["**/.pytest_cache"]
 source-includes = [
     "config",
-    "docs",
-    "scripts",
-    "share",
     "tests",
-    "duties.py",
-    "mkdocs.yml",
     "*.md",
     "LICENSE",
-]
-
-[tool.pdm.build.wheel-data]
-# Manual pages can be included in the wheel.
-# Depending on the installation tool, they will be accessible to users.
-# pipx supports it, uv does not yet, see https://github.com/astral-sh/uv/issues/4731.
-data = [
-    {path = "share/**/*", relative-to = "."},
 ]
 
 [tool.pytest.ini_options]
@@ -183,15 +160,14 @@ maintain = [
     "twine>=5.1",
 ]
 ci = [
-    "duty>=1.6",
-    "ruff>=0.4",
-    "pytest>=8.2",
+    "basedpyright>=1.28",
     "pytest-cov>=5.0",
     "pytest-randomly>=3.15",
     "pytest-xdist>=3.6",
+    "pytest>=8.2",
+    "ruff>=0.11",
     "types-markdown>=3.6",
     "types-pyyaml>=6.0",
-    "basedpyright>=1.28",
 ]
 
 [tool.uv]
