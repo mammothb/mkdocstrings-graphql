@@ -31,9 +31,6 @@ jobs:
           enable-cache: true
           cache-dependency-glob: pyproject.toml
       - name: Install dependencies
-        env:
-          PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
-          UV_PROJECT_ENVIRONMENT: .venv
         run: |
           uv venv
           uv sync --no-editable
@@ -74,11 +71,9 @@ jobs:
           cache-suffix: ${{ matrix.resolution }}
       - name: Install dependencies
         env:
-          PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
-          UV_PROJECT_ENVIRONMENT: .venv
           UV_RESOLUTION: ${{ matrix.resolution }}
         run: |
           uv venv
           uv sync --no-editable
       - name: Run the test suite
-        run: make test
+        run: uv run pytest

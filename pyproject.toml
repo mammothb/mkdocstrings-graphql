@@ -33,6 +33,7 @@ dependencies = [
     "graphql-core~=3.2.0",
     "griffe>=1.6.0",
     "mkdocstrings>=0.18",
+    "typing-extensions~=4.13.0",
 ]
 
 [project.urls]
@@ -62,6 +63,17 @@ executionEnvironments = [
     { root = "src" },
     { root = "tests", reportAttributeAccessIssue = "none", reportPrivateUsage = "none"  }
 ]
+
+[tool.coverage.report]
+omit = ["src/**/__init__.py"]
+
+[tool.coverage.run]
+branch = true
+parallel = true
+source = ["src"]
+
+[tool.coverage.xml]
+output = "coverage.xml"
 
 [tool.pdm.version]
 source = "call"
@@ -93,6 +105,13 @@ source-includes = [
 data = [
     {path = "share/**/*", relative-to = "."},
 ]
+
+[tool.pytest.ini_options]
+addopts = ["--cov"]
+python_files = ["test_*.py"]
+testpaths = ["tests"]
+
+filterwarnings = ["error", "ignore:.*rsyncdir:DeprecationWarning:xdist"]
 
 [tool.ruff]
 line-length = 120
@@ -174,19 +193,6 @@ ci = [
     "types-pyyaml>=6.0",
     "basedpyright>=1.28",
 ]
- docs = [
-    "markdown-callouts>=0.4",
-    "markdown-exec>=1.8",
-    "mkdocs>=1.6",
-    "mkdocs-coverage>=1.0",
-    "mkdocs-git-revision-date-localized-plugin>=1.2",
-    "mkdocs-llmstxt>=0.1",
-    "mkdocs-material>=9.5",
-    "mkdocs-minify-plugin>=0.8",
-    "mkdocs-section-index>=0.3",
-    "mkdocstrings[python]>=0.29",
-    "tomli>=2.0; python_version < '3.11'",
-]
 
 [tool.uv]
-default-groups = ["maintain", "ci", "docs"]
+default-groups = ["maintain", "ci"]
