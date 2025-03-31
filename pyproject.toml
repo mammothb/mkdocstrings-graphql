@@ -4,7 +4,7 @@ build-backend = "pdm.backend"
 
 [project]
 name = "mkdocstrings-graphql"
-version = "0.1.0rc1"
+version = "0.1.0-rc1"
 description = "A GraphQL handler for mkdocstrings."
 authors = [{name = "mmb L"}]
 license = "MIT"
