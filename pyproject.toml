@@ -116,9 +116,9 @@ ignore = [
     "ANN401",  # Dynamically typed expressions (typing.Any) are disallowed
     "ARG005",  # Unused lambda argument
     "C901",  # Too complex
-    "COM812", # Trailing comma missing
+    "COM812",  # Trailing comma missing
     "D105",  # Missing docstring in magic method
-    "D205", # Missing blank line after summary
+    "D205",  # Missing blank line after summary
     "D417",  # Missing argument description in the docstring
     "E501",  # Line too long
     "ERA001",  # Commented out code
@@ -127,7 +127,7 @@ ignore = [
     "PLR0912",  # Too many branches
     "PLR0913",  # Too many arguments to function call
     "PLR0915",  # Too many statements
-    "SLF001", # Private member accessed
+    "SLF001",  # Private member accessed
     "TRY003",  # Avoid specifying long messages outside the exception class
 ]
 
@@ -139,6 +139,19 @@ ban-relative-imports = "all"
 
 [tool.ruff.lint.isort]
 known-first-party = ["mkdocstrings_handlers.graphql"]
+
+[tool.ruff.lint.per-file-ignores]
+"!src/*/*.py" = [
+    "D100",  # Missing docstring in public module
+]
+"!src/**.py" = [
+    "D101",  # Missing docstring in public class
+    "D103",  # Missing docstring in public function
+]
+"tests/**.py" = [
+    "EM101",  # Raw string in exception
+    "S101",  # Use of assert detected
+]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
