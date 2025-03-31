@@ -19,7 +19,6 @@ actions = \
 	multirun \
 	release \
 	run \
-	setup \
 	test \
 	vscode
 

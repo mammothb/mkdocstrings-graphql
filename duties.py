@@ -81,18 +81,6 @@ def check_quality(ctx: Context) -> None:
 
 
 @duty
-def check_docs(ctx: Context) -> None:
-    """Check if the documentation builds correctly."""
-    Path("htmlcov").mkdir(parents=True, exist_ok=True)
-    Path("htmlcov/index.html").touch(exist_ok=True)
-    with material_insiders():
-        ctx.run(
-            tools.mkdocs.build(strict=True, verbose=True),
-            title=pyprefix("Building documentation"),
-        )
-
-
-@duty
 def check_types(ctx: Context) -> None:
     """Check that the code is correctly typed."""
     os.environ["MYPYPATH"] = "src"

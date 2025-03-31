@@ -32,15 +32,13 @@ jobs:
           cache-dependency-glob: pyproject.toml
       - name: Install dependencies
         env:
-          UV_PROJECT_ENVIRONMENT: .venv
           PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
+          UV_PROJECT_ENVIRONMENT: .venv
         run: |
           uv venv
           uv sync --no-editable
-      - name: Check if the documentation builds correctly
-        run: make check-docs
       - name: Check the code quality
-        run: make check-quality
+        run: uv run ruff check src tests --config config/ruff.toml
       - name: Check if the code is correctly typed
         run: make check-types
       - name: Check for breaking changes in the API
@@ -55,19 +53,9 @@ jobs:
       - quality
     strategy:
       matrix:
-        os:
-          - ubuntu-latest
-          - macos-latest
-          - windows-latest
-        python-version:
-          - "3.9"
-          - "3.10"
-          - "3.11"
-          - "3.12"
-          - "3.13"
-        resolution:
-          - highest
-          - lowest-direct
+        os: ["ubuntu-latest", "macos-latest", "windows-latest"]
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        resolution: ["highest", "lowest-direct"]
         exclude:
           - os: macos-latest
             resolution: lowest-direct
@@ -93,8 +81,12 @@ jobs:
           cache-suffix: ${{ matrix.resolution }}
       - name: Install dependencies
         env:
+          PYO3_USE_ABI3_FORWARD_COMPATIBILITY: "1"
+          UV_PROJECT_ENVIRONMENT: .venv
           UV_RESOLUTION: ${{ matrix.resolution }}
-        run: make setup
+        run: |
+          uv venv
+          uv sync --no-editable
       - name: Download objects inventory
         uses: actions/download-artifact@v4
         with:

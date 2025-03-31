@@ -47,29 +47,6 @@ def uv_install(venv: Path) -> None:
             shell("uv sync")
 
 
-def setup() -> None:
-    """Setup the project."""
-    if not shutil.which("uv"):
-        raise ValueError(
-            "make: setup: uv must be installed, see https://github.com/astral-sh/uv"
-        )
-
-    print("Installing dependencies (default environment)")
-    default_venv = Path(".venv")
-    if not default_venv.exists():
-        shell("uv venv")
-    uv_install(default_venv)
-
-    if PYTHON_VERSIONS:
-        for version in PYTHON_VERSIONS:
-            print(f"\nInstalling dependencies (python{version})")
-            venv_path = Path(f".venvs/{version}")
-            if not venv_path.exists():
-                shell(f"uv venv --python {version} {venv_path}")
-            with environ(UV_PROJECT_ENVIRONMENT=str(venv_path.resolve())):
-                uv_install(venv_path)
-
-
 def run(version: str, cmd: str, *args: str, **kwargs: Any) -> None:
     """Run a command in a virtual environment."""
     kwargs = {"check": True, **kwargs}
