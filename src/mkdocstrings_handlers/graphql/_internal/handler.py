@@ -25,7 +25,7 @@ if TYPE_CHECKING:
 if sys.version_info >= (3, 11):
     from contextlib import chdir
 else:
-    import os
+    import os  # pyright:ignore[reportUnreachable]
     from contextlib import contextmanager
 
     @contextmanager
@@ -41,7 +41,7 @@ else:
 if sys.version_info >= (3, 12):
     from typing import override
 else:
-    from typing_extensions import override
+    from typing_extensions import override  # pyright:ignore[reportUnreachable]
 
 
 _logger = get_logger(__name__)
