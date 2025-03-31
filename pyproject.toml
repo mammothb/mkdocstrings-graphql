@@ -127,6 +127,7 @@ ignore = [
     "PLR0912",  # Too many branches
     "PLR0913",  # Too many arguments to function call
     "PLR0915",  # Too many statements
+    "PTH",
     "SLF001",  # Private member accessed
     "TRY003",  # Avoid specifying long messages outside the exception class
 ]

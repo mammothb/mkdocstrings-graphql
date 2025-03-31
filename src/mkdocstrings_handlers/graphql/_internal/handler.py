@@ -105,10 +105,11 @@ class GraphQLHandler(BaseHandler):
         try:
             return GraphQLOptions.from_data(**options)
         except Exception as error:
-            raise PluginError(f"Invalid options: {error}") from error
+            msg = f"Invalid options: {error}"
+            raise PluginError(msg) from error
 
     @override
-    def collect(self, identifier: str, options: GraphQLOptions) -> CollectorItem:  # noqa: ARG002
+    def collect(self, identifier: str, options: GraphQLOptions) -> CollectorItem:
         """Collect data given an identifier and selection configuration.
 
         Args:
@@ -119,7 +120,8 @@ class GraphQLHandler(BaseHandler):
             The collected item.
         """
         if not identifier:
-            raise CollectionError("Empty identifier")
+            msg = "Empty identifier"
+            raise CollectionError(msg)
         schema_name, member_path = identifier.split(".", 1)
         unknown_schema = schema_name not in self._schemas_collection
         if unknown_schema:
@@ -163,7 +165,7 @@ class GraphQLHandler(BaseHandler):
         return (data.path,)
 
     @override
-    def update_env(self, config: dict[str, Any]) -> None:  # noqa: ARG002
+    def update_env(self, config: dict[str, Any]) -> None:
         """Update the Jinja environment with any custom settings/filters/options
         for this handler.
 

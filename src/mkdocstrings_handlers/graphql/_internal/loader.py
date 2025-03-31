@@ -59,9 +59,7 @@ class Loader:
         schema_paths: Sequence[str | Path],
         schemas_collection: SchemasCollection | None = None,
     ) -> None:
-        self.schemas_collection: SchemasCollection = (
-            schemas_collection or SchemasCollection()
-        )
+        self.schemas_collection: SchemasCollection = schemas_collection or SchemasCollection()
         self.document: DocumentNode = self.load_schema(list(map(Path, schema_paths)))
 
     def load(self, schema_name: str) -> None:
@@ -72,9 +70,7 @@ class Loader:
             partial_schemas = list(map(self._read_graph_file, sorted(paths)))
             schema = "\n".join(partial_schemas)
         elif (path := paths[0]).is_dir():
-            partial_schemas = list(
-                map(self._read_graph_file, sorted(self._walk_graphql_files(path)))
-            )
+            partial_schemas = list(map(self._read_graph_file, sorted(self._walk_graphql_files(path))))
             schema = "\n".join(partial_schemas)
         else:
             schema = self._read_graph_file(path)
@@ -103,9 +99,7 @@ class Loader:
                 if name in schema.operation_types:
                     for field_node in node.fields:
                         op_name = f"{name}.{field_node.name.value}"
-                        schema.members[op_name] = self._load_operation(
-                            schema_name, name, field_node
-                        )
+                        schema.members[op_name] = self._load_operation(schema_name, name, field_node)
                 else:
                     schema[name] = self._load_object(schema_name, node)
             elif type(node) is InputObjectTypeDefinitionNode:
@@ -114,9 +108,7 @@ class Loader:
                 _logger.warning(f"Unable to load {node} of type {type(node)}")
         self.schemas_collection[schema_name] = schema
 
-    def _load_enum(
-        self, schema_name: SchemaName, node: EnumTypeDefinitionNode
-    ) -> EnumTypeNode:
+    def _load_enum(self, schema_name: SchemaName, node: EnumTypeDefinitionNode) -> EnumTypeNode:
         name = node.name.value
         return EnumTypeNode(
             name=name,
@@ -125,9 +117,7 @@ class Loader:
             values=self._parse_enum_values(node.values),
         )
 
-    def _load_input(
-        self, schema_name: SchemaName, node: InputObjectTypeDefinitionNode
-    ) -> InputObjectTypeNode:
+    def _load_input(self, schema_name: SchemaName, node: InputObjectTypeDefinitionNode) -> InputObjectTypeNode:
         name = node.name.value
         return InputObjectTypeNode(
             name=name,
@@ -136,9 +126,7 @@ class Loader:
             fields=self._parse_input_values(node.fields),
         )
 
-    def _load_interface(
-        self, schema_name: SchemaName, node: InterfaceTypeDefinitionNode
-    ) -> InterfaceTypeNode:
+    def _load_interface(self, schema_name: SchemaName, node: InterfaceTypeDefinitionNode) -> InterfaceTypeNode:
         name = node.name.value
         return InterfaceTypeNode(
             name=name,
@@ -147,9 +135,7 @@ class Loader:
             fields=self._parse_fields(node.fields),
         )
 
-    def _load_object(
-        self, schema_name: SchemaName, node: ObjectTypeDefinitionNode
-    ) -> ObjectTypeNode:
+    def _load_object(self, schema_name: SchemaName, node: ObjectTypeDefinitionNode) -> ObjectTypeNode:
         name = node.name.value
         return ObjectTypeNode(
             name=name,
@@ -158,9 +144,7 @@ class Loader:
             fields=self._parse_fields(node.fields),
         )
 
-    def _load_operation(
-        self, schema: str, op_name: str, node: FieldDefinitionNode
-    ) -> OperationTypeNode:
+    def _load_operation(self, schema: str, op_name: str, node: FieldDefinitionNode) -> OperationTypeNode:
         name = node.name.value
         return OperationTypeNode(
             name=name,
@@ -170,9 +154,7 @@ class Loader:
             type=self._parse_type(node.type),
         )
 
-    def _load_scalar(
-        self, schema_name: SchemaName, node: ScalarTypeDefinitionNode
-    ) -> ScalarTypeNode:
+    def _load_scalar(self, schema_name: SchemaName, node: ScalarTypeDefinitionNode) -> ScalarTypeNode:
         name = node.name.value
         return ScalarTypeNode(
             name=name,
@@ -182,15 +164,10 @@ class Loader:
 
     def _load_schema_definition(self, node: SchemaDefinitionNode) -> SchemaDefinition:
         return SchemaDefinition(
-            **{
-                op_type.operation.value: op_type.type.name.value
-                for op_type in node.operation_types
-            }
+            **{op_type.operation.value: op_type.type.name.value for op_type in node.operation_types}
         )
 
-    def _load_union(
-        self, schema_name: SchemaName, node: UnionTypeDefinitionNode
-    ) -> UnionTypeNode:
+    def _load_union(self, schema_name: SchemaName, node: UnionTypeDefinitionNode) -> UnionTypeNode:
         name = node.name.value
         return UnionTypeNode(
             name=name,
@@ -199,9 +176,7 @@ class Loader:
             types=[type_node.name.value for type_node in node.types],
         )
 
-    def _parse_enum_values(
-        self, nodes: tuple[EnumValueDefinitionNode, ...]
-    ) -> list[EnumValue]:
+    def _parse_enum_values(self, nodes: tuple[EnumValueDefinitionNode, ...]) -> list[EnumValue]:
         return [
             EnumValue(
                 name=node.name.value,
@@ -223,9 +198,7 @@ class Loader:
     def _parse_description(self, node: StringValueNode | None) -> str:
         return node.value if node is not None else ""
 
-    def _parse_input_values(
-        self, nodes: tuple[InputValueDefinitionNode, ...]
-    ) -> list[Input]:
+    def _parse_input_values(self, nodes: tuple[InputValueDefinitionNode, ...]) -> list[Input]:
         return [
             Input(
                 name=node.name.value,
@@ -277,7 +250,8 @@ class Loader:
                 is_list=is_list,
                 non_null_list=non_null_list,
             )
-        raise ValueError(f"Unknown type {node.to_dict()}")
+        msg = f"Unknown type {node.to_dict()}"
+        raise ValueError(msg)
 
     def _read_graph_file(self, path: Path) -> str:
         with open(path, encoding="utf-8") as f:
