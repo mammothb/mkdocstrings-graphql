@@ -15,6 +15,7 @@ env:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    environment: Development
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -52,6 +53,7 @@ jobs:
           - os: windows-latest
             resolution: lowest-direct
     runs-on: ${{ matrix.os }}
+    environment: Development
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -77,3 +79,8 @@ jobs:
           uv sync --no-editable
       - name: Run the test suite
         run: uv run pytest
+      - name: Upload code coverage
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: mammothb/mkdocstrings-graphql
