@@ -27,9 +27,10 @@ if sys.version_info >= (3, 11):
 else:
     import os  # pyright:ignore[reportUnreachable]
     from contextlib import contextmanager
+    from pathlib import Path
 
     @contextmanager
-    def chdir(path: str) -> Iterator[None]:
+    def chdir(path: Path) -> Iterator[None]:
         curr_dir = os.getcwd()
         os.chdir(path)
         try:
@@ -49,21 +50,28 @@ _logger = get_logger(__name__)
 
 @final
 class GraphQLHandler(BaseHandler):
-    """The GraphQL handler class."""
+    """The GraphQL handler class.
+
+    Attributes:
+        name: The handler's name.
+        domain: The cross-documentation domain/language for this handler.
+        enable_inventory: Whether this handler is interested in enabling the
+            creation of the 'objects.inv' Sphinx inventory file.
+        fallback_theme: The theme to fallback to.
+        config: The handler configuration.
+        base_dir: The base directory of the project.
+        global_options: The handler configuration options.
+    """
 
     name: ClassVar[str] = "graphql"
-    """The handler's name."""
     domain: ClassVar[str] = "graphql"
-    """The cross-documentation domain/language for this handler."""
     enable_inventory: ClassVar[bool] = False
-    """Whether this handler is interested in enabling the creation of the `objects.inv` Sphinx inventory file."""
     fallback_theme: ClassVar[str] = "material"
-    """The theme to fallback to."""
 
     def __init__(self, config: GraphQLConfig, base_dir: Path, **kwargs: Any) -> None:
-        """Initialize the handler.
+        """Initializes the handler.
 
-        Parameters:
+        Args:
             config: The handler configuration.
             base_dir: The base directory of the project.
             **kwargs: Arguments passed to the parent constructor.
@@ -72,10 +80,10 @@ class GraphQLHandler(BaseHandler):
 
         self.config = config
         self.base_dir = base_dir
-        self.global_options = config.options
+        self.global_options = config.handler_options
 
         schemas = config.schemas or {}
-        with chdir(str(self.base_dir)):
+        with chdir(self.base_dir):
             resolved_schemas: dict[SchemaName, list[str]] = {}
             for name, paths in schemas.items():
                 resolved_schemas[name] = []
@@ -89,18 +97,15 @@ class GraphQLHandler(BaseHandler):
 
     @override
     def get_options(self, local_options: Mapping[str, Any]) -> HandlerOptions:
-        """Get combined default, global and local options.
+        """Combines default, global, and local options.
 
-        Arguments:
+        Args:
             local_options: The local options.
 
         Returns:
             The combined options.
         """
-        extra = {
-            **getattr(self.global_options, "extra", {}),
-            **local_options.get("extra", {}),
-        }
+        extra = {**getattr(self.global_options, "extra", {}), **local_options.get("extra", {})}
         options = {**asdict(self.global_options), **local_options, "extra": extra}
         try:
             return GraphQLOptions.from_data(**options)
@@ -110,7 +115,7 @@ class GraphQLHandler(BaseHandler):
 
     @override
     def collect(self, identifier: str, options: GraphQLOptions) -> CollectorItem:
-        """Collect data given an identifier and selection configuration.
+        """Collects data given an identifier and selection configuration.
 
         Args:
             identifier: The identifier of the object to collect.
@@ -118,6 +123,9 @@ class GraphQLHandler(BaseHandler):
 
         Returns:
             The collected item.
+
+        Raises:
+            CollectionError: If ``identifier`` is an empty string.
         """
         if not identifier:
             msg = "Empty identifier"
@@ -134,7 +142,7 @@ class GraphQLHandler(BaseHandler):
 
     @override
     def render(self, data: CollectorItem, options: GraphQLOptions) -> str:
-        """Render the collected data.
+        """Renders the collected data.
 
         Args:
             data: The collected data.
@@ -166,8 +174,8 @@ class GraphQLHandler(BaseHandler):
 
     @override
     def update_env(self, config: dict[str, Any]) -> None:
-        """Update the Jinja environment with any custom settings/filters/options
-        for this handler.
+        """Updates the Jinja environment with any custom
+        settings/filters/options for this handler.
 
         Args:
             config: MkDocs configuration, read from `mkdocs.yml`.
@@ -177,19 +185,11 @@ class GraphQLHandler(BaseHandler):
         self.env.keep_trailing_newline = False
         self.env.filters["format_signature"] = render.format_signature  # pyright:ignore[reportArgumentType]
 
-    # You can also implement the `get_inventory_urls` and `load_inventory` methods
-    # if you want to support loading object inventories.
-    # You can also implement the `render_backlinks` method if you want to support backlinks.
 
+def get_handler(handler_config: MutableMapping[str, Any], tool_config: MkDocsConfig, **kwargs: Any) -> GraphQLHandler:
+    """Returns an instance of `GraphQLHandler`.
 
-def get_handler(
-    handler_config: MutableMapping[str, Any],
-    tool_config: MkDocsConfig,
-    **kwargs: Any,
-) -> GraphQLHandler:
-    """Simply return an instance of `GraphQLHandler`.
-
-    Arguments:
+    Args:
         handler_config: The handler configuration.
         tool_config: The tool (SSG) configuration.
 
@@ -197,8 +197,4 @@ def get_handler(
         An instance of `GraphQLHandler`.
     """
     base_dir = Path(tool_config.config_file_path or "./mkdocs.yml").parent
-    return GraphQLHandler(
-        config=GraphQLConfig.from_data(**handler_config),
-        base_dir=base_dir,
-        **kwargs,
-    )
+    return GraphQLHandler(config=GraphQLConfig.from_data(**handler_config), base_dir=base_dir, **kwargs)
