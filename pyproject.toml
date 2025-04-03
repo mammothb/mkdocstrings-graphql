@@ -84,7 +84,7 @@ source-includes = [
 ]
 
 [tool.pytest.ini_options]
-addopts = ["--cov"]
+addopts = ["--cov", "--cov-report=xml"]
 python_files = ["test_*.py"]
 testpaths = ["tests"]
 
