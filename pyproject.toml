@@ -61,6 +61,10 @@ executionEnvironments = [
 
 [tool.coverage.report]
 omit = ["src/**/__init__.py"]
+exclude_also = [
+    "if TYPE_CHECKING",
+    "raise NotImplementedError",
+]
 
 [tool.coverage.run]
 branch = true
