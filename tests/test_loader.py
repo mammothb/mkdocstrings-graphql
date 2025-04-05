@@ -1,11 +1,10 @@
-import sys
 from pathlib import Path
-from typing import Any
 
 import pytest
 from syrupy.assertion import SnapshotAssertion
-from syrupy.extensions.amber import AmberSnapshotExtension
-from syrupy.types import SerializableData
+from syrupy.extensions.amber.serializer import AmberDataSerializer
+from syrupy.filters import props
+from syrupy.matchers import path_type
 
 from mkdocstrings_handlers.graphql._internal.error import GraphQLFileSyntaxError
 from mkdocstrings_handlers.graphql._internal.loader import Loader
@@ -20,26 +19,9 @@ from mkdocstrings_handlers.graphql._internal.models import (
     ObjectTypeNode,
     OperationTypeNode,
     ScalarTypeNode,
+    Schema,
     UnionTypeNode,
 )
-
-if sys.version_info >= (3, 12):
-    from typing import override
-else:
-    from typing_extensions import override  # pyright:ignore[reportUnreachable]
-
-
-class SortedSetSnapshotExtension(AmberSnapshotExtension):
-    @override
-    def serialize(self, data: SerializableData, **kwargs: Any) -> str:
-        """Returns the serialized form of 'data' to be compared
-        with the snapshot data written to disk.
-
-        Sorts ``set`` data before serializing.
-        """
-        if isinstance(data, set):
-            data = sorted(data)
-        return super().serialize(data, **kwargs)
 
 
 def test_graphql_syntax_error(tmp_path: Path) -> None:
@@ -375,4 +357,10 @@ def test_load_multiple_files(snapshot: SnapshotAssertion) -> None:
     loader = Loader(schema_paths=[schema_dir / "constructs.graphql", schema_dir / "schema.graphql"])
     loader.load(schema_name="schemaName")
 
-    assert loader.schemas_collection["schemaName"] == snapshot.use_extension(SortedSetSnapshotExtension)
+    assert loader.schemas_collection["schemaName"] == snapshot(
+        exclude=props("definition"),
+        matcher=path_type(
+            types=(Schema,),
+            replacer=lambda data, *_: AmberDataSerializer.object_as_named_tuple(data),
+        ),
+    )

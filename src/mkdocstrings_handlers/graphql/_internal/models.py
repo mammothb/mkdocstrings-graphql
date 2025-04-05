@@ -102,8 +102,8 @@ class Schema:
         self.members[key] = value
 
     @property
-    def operation_types(self) -> set[str]:
-        return getattr(self.definition, "types", set())
+    def operation_types(self) -> frozenset[str]:
+        return getattr(self.definition, "types", frozenset())
 
 
 #######
