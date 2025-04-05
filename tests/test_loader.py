@@ -1,7 +1,10 @@
 from pathlib import Path
+from typing import Any
 
 import pytest
 from syrupy.assertion import SnapshotAssertion
+from syrupy.extensions.amber import AmberSnapshotExtension
+from syrupy.types import SerializableData
 
 from mkdocstrings_handlers.graphql._internal.error import GraphQLFileSyntaxError
 from mkdocstrings_handlers.graphql._internal.loader import Loader
@@ -18,6 +21,13 @@ from mkdocstrings_handlers.graphql._internal.models import (
     ScalarTypeNode,
     UnionTypeNode,
 )
+
+
+class SortedSetSnapshotExtension(AmberSnapshotExtension):
+    def serialize(self, data: SerializableData, **kwargs: Any) -> str:
+        if isinstance(data, set):
+            data = sorted(data)
+        return super().serialize(data, **kwargs)
 
 
 def test_graphql_syntax_error(tmp_path: Path) -> None:
@@ -353,4 +363,4 @@ def test_load_multiple_files(snapshot: SnapshotAssertion) -> None:
     loader = Loader(schema_paths=[schema_dir / "constructs.graphql", schema_dir / "schema.graphql"])
     loader.load(schema_name="schemaName")
 
-    assert loader.schemas_collection["schemaName"] == snapshot
+    assert loader.schemas_collection["schemaName"] == snapshot.use_extension(SortedSetSnapshotExtension)

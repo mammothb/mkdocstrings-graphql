@@ -77,12 +77,12 @@ class SchemaDefinition:
     mutation: str | None = None
     query: str | None = None
     subscription: str | None = None
-    types: set[str] = field(init=False)
+    types: frozenset[str] = field(init=False)
 
     def __post_init__(self) -> None:
-        self.types = {
+        self.types = frozenset(
             type_name for type_name in (self.mutation, self.query, self.subscription) if type_name is not None
-        }
+        )
 
 
 @dataclass
