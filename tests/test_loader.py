@@ -20,7 +20,7 @@ from mkdocstrings_handlers.graphql._internal.models import (
 )
 
 
-def test_graphql_syntax_error(tmp_path: Path):
+def test_graphql_syntax_error(tmp_path: Path) -> None:
     schema_path = tmp_path / "schema.graphql"
     with open(schema_path, "w") as f:
         f.write("""
@@ -34,7 +34,7 @@ def test_graphql_syntax_error(tmp_path: Path):
     assert str(excinfo.value).startswith(f"Could not load {schema_path}")
 
 
-def test_load_enum(tmp_path: Path):
+def test_load_enum(tmp_path: Path) -> None:
     schema_path = tmp_path / "schema.graphql"
     with open(schema_path, "w") as f:
         f.write("""
@@ -55,7 +55,7 @@ def test_load_enum(tmp_path: Path):
     )
 
 
-def test_load_input(tmp_path: Path):
+def test_load_input(tmp_path: Path) -> None:
     with open(tmp_path / "schema.graphql", "w") as f:
         f.write("""
             input TestInput {
@@ -86,7 +86,7 @@ def test_load_input(tmp_path: Path):
     )
 
 
-def test_load_interface(tmp_path: Path):
+def test_load_interface(tmp_path: Path) -> None:
     with open(tmp_path / "schema.graphql", "w") as f:
         f.write("""
             interface TestInterface {
@@ -117,7 +117,7 @@ def test_load_interface(tmp_path: Path):
     )
 
 
-def test_load_object(tmp_path: Path):
+def test_load_object(tmp_path: Path) -> None:
     with open(tmp_path / "schema.graphql", "w") as f:
         f.write("""
             type TestObject {
@@ -148,7 +148,7 @@ def test_load_object(tmp_path: Path):
     )
 
 
-def test_load_operation(tmp_path: Path):
+def test_load_operation(tmp_path: Path) -> None:
     schema_path = tmp_path / "schema.graphql"
     with open(schema_path, "w") as f:
         f.write("""
@@ -213,7 +213,7 @@ def test_load_operation(tmp_path: Path):
     )
 
 
-def test_load_scalar(tmp_path: Path):
+def test_load_scalar(tmp_path: Path) -> None:
     schema_path = tmp_path / "schema.graphql"
     with open(schema_path, "w") as f:
         f.write("scalar TestScalar")
@@ -226,7 +226,7 @@ def test_load_scalar(tmp_path: Path):
     )
 
 
-def test_load_schema_definition(tmp_path: Path):
+def test_load_schema_definition(tmp_path: Path) -> None:
     schema_path = tmp_path / "schema.graphql"
     with open(schema_path, "w") as f:
         f.write("""
@@ -247,7 +247,7 @@ def test_load_schema_definition(tmp_path: Path):
     assert loader.schemas_collection["schemaName"].definition.types == {"Mutation", "Query", "Subscription"}
 
 
-def test_load_schema_definition_partial_definition(tmp_path: Path):
+def test_load_schema_definition_partial_definition(tmp_path: Path) -> None:
     schema_path = tmp_path / "schema.graphql"
     with open(schema_path, "w") as f:
         f.write("""
@@ -267,7 +267,7 @@ def test_load_schema_definition_partial_definition(tmp_path: Path):
     assert loader.schemas_collection["schemaName"].definition.types == {"Mutation", "Query"}
 
 
-def test_load_union(tmp_path: Path):
+def test_load_union(tmp_path: Path) -> None:
     schema_path = tmp_path / "schema.graphql"
     with open(schema_path, "w") as f:
         f.write("""
@@ -292,7 +292,7 @@ def test_load_union(tmp_path: Path):
     )
 
 
-def test_parse_type(tmp_path: Path):
+def test_parse_type(tmp_path: Path) -> None:
     with open(tmp_path / "schema.graphql", "w") as f:
         f.write("""
             type TestObject {
@@ -347,7 +347,7 @@ def test_parse_type(tmp_path: Path):
     )
 
 
-def test_load_multiple_files(snapshot: SnapshotAssertion):
+def test_load_multiple_files(snapshot: SnapshotAssertion) -> None:
     schema_dir = Path(__file__).parent / "fixtures" / "schema"
 
     loader = Loader(schema_paths=[schema_dir / "constructs.graphql", schema_dir / "schema.graphql"])
