@@ -67,9 +67,6 @@ branch = true
 parallel = true
 source = ["src"]
 
-[tool.coverage.xml]
-output = "coverage.xml"
-
 [tool.pdm.build]
 package-dir = "src"
 includes = ["src/mkdocstrings_handlers"]
@@ -87,7 +84,7 @@ source-includes = [
 source = "scm"
 
 [tool.pytest.ini_options]
-addopts = ["--cov", "--cov-report=xml"]
+addopts = ["--cov", "--cov-report=xml", "--cov-report=html"]
 python_files = ["test_*.py"]
 testpaths = ["tests"]
 
