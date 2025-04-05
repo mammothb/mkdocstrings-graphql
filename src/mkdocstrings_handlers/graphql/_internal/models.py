@@ -77,14 +77,12 @@ class SchemaDefinition:
     mutation: str | None = None
     query: str | None = None
     subscription: str | None = None
-    types: set[str] = field(init=False)
+    types: frozenset[str] = field(init=False)
 
     def __post_init__(self) -> None:
-        self.types = {
-            type_name
-            for type_name in (self.mutation, self.query, self.subscription)
-            if type_name is not None
-        }
+        self.types = frozenset(
+            type_name for type_name in (self.mutation, self.query, self.subscription) if type_name is not None
+        )
 
 
 @dataclass
@@ -94,6 +92,9 @@ class Schema:
     definition: SchemaDefinition | None = None
     members: dict[str, Node] = field(default_factory=dict)
 
+    def __contains__(self, item: Any) -> bool:
+        return item in self.members
+
     def __getitem__(self, key: Any) -> Node:
         return self.members[key]
 
@@ -101,8 +102,8 @@ class Schema:
         self.members[key] = value
 
     @property
-    def operation_types(self) -> set[str]:
-        return getattr(self.definition, "types", set())
+    def operation_types(self) -> frozenset[str]:
+        return getattr(self.definition, "types", frozenset())
 
 
 #######
@@ -120,10 +121,7 @@ class EnumTypeNode(Node):
         return [
             DocstringSectionText(value=self.description),
             DocstringSectionEnumValues(
-                value=[
-                    DocstringEnumValue(name=value.name, description=value.description)
-                    for value in self.values
-                ]
+                value=[DocstringEnumValue(name=value.name, description=value.description) for value in self.values]
             ),
         ]
 
@@ -206,9 +204,7 @@ class OperationTypeNode(Node):
                     for argument in self.arguments
                 ]
             ),
-            DocstringSectionReturns(
-                value=[DocstringReturn(description="", annotation=self.type.render)]
-            ),
+            DocstringSectionReturns(value=[DocstringReturn(description="", annotation=self.type.render)]),
         ]
 
 

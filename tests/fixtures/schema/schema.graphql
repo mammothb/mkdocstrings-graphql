@@ -1,0 +1,163 @@
+"""The schema."""
+schema {
+    mutation: Mutation
+    query: Query
+}
+
+"""Generation I Pokemon types."""
+enum Type {
+    """Bug type."""
+    BUG
+    """Dragon type."""
+    DRAGON
+    """Electric type."""
+    ELECTRIC
+    """Fighting type."""
+    FIGHTING
+    """Fire type."""
+    FIRE
+    """Flying type."""
+    FLYING
+    """Ghost type."""
+    GHOST
+    """Grass type."""
+    GRASS
+    """Ground type."""
+    GROUND
+    """Ice type."""
+    ICE
+    """Normal type."""
+    NORMAL
+    """Poison type."""
+    POISON
+    """Psychic type."""
+    PSYCHIC
+    """Rock type."""
+    ROCK
+    """Water type."""
+    WATER
+}
+
+"""Generic error interface."""
+interface Error {
+    """Error message."""
+    message: String!
+}
+
+"""Interface containing all annotation combinations."""
+interface Annotation {
+    """Nullable element."""
+    null: String
+    """Non-nullable element."""
+    non_null: String!
+    """Nullable list with nullable elements."""
+    null_list_null: [String]
+    """Nullable list with non-nullable elements."""
+    null_list_non_null: [String!]
+    """Non-nullable list with nullable elements."""
+    non_null_list_null: [String]!
+    """Non-nullable list with non-nullable elements."""
+    non_null_list_non_null: [String!]!
+}
+
+type AnnotationImpl implements Annotation {
+    """Nullable element."""
+    null: String
+    """Non-nullable element."""
+    non_null: String!
+    """Nullable list with nullable elements."""
+    null_list_null: [String]
+    """Nullable list with non-nullable elements."""
+    null_list_non_null: [String!]
+    """Non-nullable list with nullable elements."""
+    non_null_list_null: [String]!
+    """Non-nullable list with non-nullable elements."""
+    non_null_list_non_null: [String!]!
+    """Custom element."""
+    custom: Int!
+}
+
+type InvalidPokemonNumberError implements Error {
+    message: String!
+    no: PokemonNumber!
+}
+
+type PokemonExistsError implements Error {
+    message: String!
+    no: PokemonNumber!
+}
+
+type PokemonNotFoundError implements Error {
+    message: String!
+    no: PokemonNumber!
+}
+
+input CreatePokemonInput {
+    no: PokemonNumber!
+    name: String!
+    types: [Type!]!
+    prevEvolutionNumbers: [PokemonNumber!]
+    nextEvolutionNumbers: [PokemonNumber!]
+}
+
+type EvolutionNode {
+    no: PokemonNumber!
+    name: String!
+}
+
+type TypeNode {
+    id: ID!
+    type: Type!
+}
+
+type PokemonNode {
+    no: PokemonNumber!
+    name: String!
+    types: [TypeNode!]!
+    prevEvolutions: [EvolutionNode!]!
+    nextEvolutions: [EvolutionNode!]!
+}
+
+union CreatePokemonError =
+    InvalidPokemonNumberError
+  | PokemonExistsError
+
+type CreatePokemonResponse {
+    data: PokemonNode
+    error: CreatePokemonError
+}
+
+type Mutation {
+    """Creates a Pokemon. If ``overwrite`` is true, overwrite the existing
+    Pokemon if a duplicate with the same ``input.no`` exists.
+    """
+    createPokemon(
+        """Parameters which determines to Pokemon to be created."""
+        input: CreatePokemonInput!
+        """If we should the existing Pokemon if a duplicate with the same
+        ``no`` exists.
+        """
+        overwrite: Boolean
+    ): CreatePokemonResponse!
+}
+
+union PokemonError =
+    InvalidPokemonNumberError
+  | PokemonNotFoundError
+
+
+"""Response object for Query.pokemon."""
+type PokemonResponse {
+    """The Pokemon specified by the query."""
+    data: PokemonNode
+    """Errors encountered during the query."""
+    error: PokemonError
+}
+
+type Query {
+    """Queries for a Pokemon specified by ``no``."""
+    pokemon(
+        """The Pokemon number, in the range of '0001' and '9999'."""
+        no: PokemonNumber!
+    ): PokemonResponse!
+}
