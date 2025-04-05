@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -22,8 +23,14 @@ from mkdocstrings_handlers.graphql._internal.models import (
     UnionTypeNode,
 )
 
+if sys.version_info >= (3, 12):
+    from typing import override
+else:
+    from typing_extensions import override  # pyright:ignore[reportUnreachable]
+
 
 class SortedSetSnapshotExtension(AmberSnapshotExtension):
+    @override
     def serialize(self, data: SerializableData, **kwargs: Any) -> str:
         """Returns the serialized form of 'data' to be compared
         with the snapshot data written to disk.
