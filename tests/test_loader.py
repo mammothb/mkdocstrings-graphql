@@ -25,6 +25,11 @@ from mkdocstrings_handlers.graphql._internal.models import (
 
 class SortedSetSnapshotExtension(AmberSnapshotExtension):
     def serialize(self, data: SerializableData, **kwargs: Any) -> str:
+        """Returns the serialized form of 'data' to be compared
+        with the snapshot data written to disk.
+
+        Sorts ``set`` data before serializing.
+        """
         if isinstance(data, set):
             data = sorted(data)
         return super().serialize(data, **kwargs)
