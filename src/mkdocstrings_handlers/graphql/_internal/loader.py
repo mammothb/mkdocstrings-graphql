@@ -157,9 +157,7 @@ class Loader:
     def _load_scalar(self, schema_name: SchemaName, node: ScalarTypeDefinitionNode) -> ScalarTypeNode:
         name = node.name.value
         return ScalarTypeNode(
-            name=name,
-            path=f"{schema_name}.{name}",
-            description=self._parse_description(node.description),
+            name=name, path=f"{schema_name}.{name}", description=self._parse_description(node.description)
         )
 
     def _load_schema_definition(self, node: SchemaDefinitionNode) -> SchemaDefinition:
@@ -178,11 +176,7 @@ class Loader:
 
     def _parse_enum_values(self, nodes: tuple[EnumValueDefinitionNode, ...]) -> list[EnumValue]:
         return [
-            EnumValue(
-                name=node.name.value,
-                description=self._parse_description(node.description),
-            )
-            for node in nodes
+            EnumValue(name=node.name.value, description=self._parse_description(node.description)) for node in nodes
         ]
 
     def _parse_fields(self, nodes: tuple[FieldDefinitionNode, ...]) -> list[Field]:
@@ -223,33 +217,12 @@ class Loader:
         """
         if type(node) is NonNullTypeNode:
             if type(node.type) is ListTypeNode:
-                return self._parse_type(
-                    node.type,
-                    non_null=non_null,
-                    is_list=is_list,
-                    non_null_list=True,
-                )
-            return self._parse_type(
-                node.type,
-                non_null=True,
-                is_list=is_list,
-                non_null_list=non_null_list,
-            )
-
+                return self._parse_type(node.type, non_null=non_null, is_list=is_list, non_null_list=True)
+            return self._parse_type(node.type, non_null=True, is_list=is_list, non_null_list=non_null_list)
         if type(node) is ListTypeNode:
-            return self._parse_type(
-                node.type,
-                non_null=non_null,
-                is_list=True,
-                non_null_list=non_null_list,
-            )
+            return self._parse_type(node.type, non_null=non_null, is_list=True, non_null_list=non_null_list)
         if type(node) is NamedTypeNode:
-            return Annotation(
-                name=node.name.value,
-                non_null=non_null,
-                is_list=is_list,
-                non_null_list=non_null_list,
-            )
+            return Annotation(name=node.name.value, non_null=non_null, is_list=is_list, non_null_list=non_null_list)
         msg = f"Unknown type {node.to_dict()}"
         raise ValueError(msg)
 

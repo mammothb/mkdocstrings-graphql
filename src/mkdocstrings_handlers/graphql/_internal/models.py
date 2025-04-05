@@ -81,9 +81,7 @@ class SchemaDefinition:
 
     def __post_init__(self) -> None:
         self.types = {
-            type_name
-            for type_name in (self.mutation, self.query, self.subscription)
-            if type_name is not None
+            type_name for type_name in (self.mutation, self.query, self.subscription) if type_name is not None
         }
 
 
@@ -93,6 +91,9 @@ class Schema:
 
     definition: SchemaDefinition | None = None
     members: dict[str, Node] = field(default_factory=dict)
+
+    def __contains__(self, item: Any) -> bool:
+        return item in self.members
 
     def __getitem__(self, key: Any) -> Node:
         return self.members[key]
@@ -120,10 +121,7 @@ class EnumTypeNode(Node):
         return [
             DocstringSectionText(value=self.description),
             DocstringSectionEnumValues(
-                value=[
-                    DocstringEnumValue(name=value.name, description=value.description)
-                    for value in self.values
-                ]
+                value=[DocstringEnumValue(name=value.name, description=value.description) for value in self.values]
             ),
         ]
 
@@ -206,9 +204,7 @@ class OperationTypeNode(Node):
                     for argument in self.arguments
                 ]
             ),
-            DocstringSectionReturns(
-                value=[DocstringReturn(description="", annotation=self.type.render)]
-            ),
+            DocstringSectionReturns(value=[DocstringReturn(description="", annotation=self.type.render)]),
         ]
 
 

@@ -1,0 +1,2 @@
+"""The Pokemon number, in the range of "0001" to "9999"."""
+scalar PokemonNumber
