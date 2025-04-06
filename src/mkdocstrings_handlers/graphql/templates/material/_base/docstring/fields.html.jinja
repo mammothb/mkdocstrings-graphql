@@ -19,13 +19,17 @@ Context:
                 <th>Name</th>
                 <th>Type</th>
                 <th>Description</th>
-            </td>
+            </tr>
         </thead>
         <tbody>
             {% for field in section.value %}
                 <tr class="doc-section-item">
                     <td>{{ field.name }}</td>
-                    <td>{{ field.annotation }}</td>
+                    <td>
+                        {% with expression = field.annotation, backlink_type = "used-by" %}
+                            <code>{% include "expression.html.jinja" with context %}</code>
+                        {% endwith %}
+                    </td>
                     <td>{{ field.description }}</td>
                 </tr>
             {% endfor %}

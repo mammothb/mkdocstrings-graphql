@@ -8,7 +8,17 @@ expression.
     {#- Logging block. -#}
 {% endblock logs %}
 
-{%- macro crossref(name, backlink_type="") -%}
+{%- macro crossref(annotation, backlink_type="") -%}
+    {#- Outputs a cross-reference.
+
+    Args:
+        annotation (Annotation): The annotation to cross-reference.
+
+    Returns:
+        Either a cross-reference (using an autoref element) or the annotation
+        itself.
+    -#}
+    <autoref identifier="{{ annotation.canonical_path }}"{% if backlink_type %} backlink-type="{{ backlink_type }}" backlink-anchor="{{ html_id }}"{% endif %} optional>{{ annotation.render }}</autoref>
 {%- endmacro -%}
 
 {%- macro render(expression, backlink_type="") -%}
@@ -22,7 +32,9 @@ expression.
     -#}
     {%- if expression is string -%}
         {%- if signature -%}{{ expression|safe }}{%- else -%}{{ expression }}{%- endif -%}
-    {%- else -%}
+    {%- elif expression.class_name == "Annotation" -%}
+        {{ crossref(expression, backlink_type) }}
+    {% else %}
         {{ expression.render }}
     {%- endif -%}
 {%- endmacro -%}

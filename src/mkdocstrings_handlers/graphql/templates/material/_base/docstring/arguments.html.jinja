@@ -25,7 +25,11 @@ Context:
             {% for argument in section.value %}
                 <tr class="doc-section-item">
                     <td>{{ argument.name }}</td>
-                    <td>{{ argument.annotation }}</td>
+                    <td>
+                        {% with expression = argument.annotation, backlink_type = "used-by" %}
+                            <code>{% include "expression.html.jinja" with context %}</code>
+                        {% endwith %}
+                    </td>
                     <td>{{ argument.description }}</td>
                 </tr>
             {% endfor %}
