@@ -1,6 +1,6 @@
 {#- Template for GraphQL objects.
 
-This template renders a GraphQL object.
+Renders a GraphQL object.
 
 Context:
     gql_object (InputObjectTypeNode | ObjectTypeNode): The object to render.
@@ -15,50 +15,28 @@ Context:
     {{ log.debug("Rendering " + gql_object.path) }}
 {% endblock logs %}
 
-<div class="doc doc-object doc-gql-object">
+<div class="doc doc-node doc-gql-object">
     {% with obj = gql_object, html_id = gql_object.path, all_fields = gql_object.fields %}
         {% if root %}
             {% set show_full_path = config.show_root_full_path %}
-            {% set root_members = True %}
-        {% elif root_members %}
-            {% set show_full_path = config.show_root_members_full_path or config.show_node_full_path %}
-            {% set root_members = False %}
         {% else %}
             {% set show_full_path = config.show_node_full_path %}
         {% endif %}
 
         {% set gql_object_name = gql_object.path if show_full_path else gql_object.name %}
 
-        {% if not root or config.show_root_heading %}
-            {% filter heading(
-                    heading_level,
-                    role="gql_object",
-                    id=html_id,
-                    class="doc doc-heading",
-                    toc_label=gql_object.name,
-                ) %}
-                {% block heading scoped %}
-                    {#- Heading block.
-
-                    Renders the heading for the object.
-                    -#}
-                    <span class="doc doc-gql-object-name">{{ config.heading if config.heading and root else gql_object_name }}</span>
-                {% endblock heading %}
-            {% endfilter %}
-
-        {% else %}
-            {% if config.show_root_toc_entry %}
-                {% filter heading(
-                        heading_level,
-                        role="gql_object",
-                        id=html_id,
-                        toc_label=config.toc_label if config.toc_label and root else gql_object.name,
-                        hidden=True,
-                    ) %}
-                {% endfilter %}
-            {% endif %}
-            {% set heading_level = heading_level - 1 %}
-        {% endif %}
+        {% filter heading(
+                heading_level,
+                role="gql_object",
+                id=html_id,
+                class="doc doc-heading",
+                toc_label=gql_object.name,
+            ) %}
+            {% block heading scoped %}
+                {#- Heading block. -#}
+                <span class="doc doc-gql-object-name">{{ config.heading if config.heading and root else gql_object_name }}</span>
+            {% endblock heading %}
+        {% endfilter %}
 
         <div class="doc doc-contents {% if root %}first{% endif %}">
             {% block contents scoped %}
