@@ -7,9 +7,9 @@ from syrupy.filters import props
 from syrupy.matchers import path_type
 
 from mkdocstrings_handlers.graphql._internal.error import GraphQLFileSyntaxError
+from mkdocstrings_handlers.graphql._internal.expressions import Annotation
 from mkdocstrings_handlers.graphql._internal.loader import Loader
 from mkdocstrings_handlers.graphql._internal.models import (
-    Annotation,
     EnumTypeNode,
     EnumValue,
     Field,
