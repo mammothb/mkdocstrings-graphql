@@ -25,6 +25,8 @@ Context:
             {% include "docstring/enum_values.html.jinja" %}
         {% elif section.kind.value == "fields" %}
             {% include "docstring/fields.html.jinja" %}
+        {% elif section.kind.value == "returns" %}
+            {% include "docstring/returns.html.jinja" %}
         {% endif %}
     {% endfor %}
 {% endif %}

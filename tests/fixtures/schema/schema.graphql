@@ -154,10 +154,25 @@ type PokemonResponse {
     error: PokemonError
 }
 
+union WeaknessError =
+    InvalidPokemonNumberError
+  | PokemonNotFoundError
+
+type WeaknessResponse {
+    data: [Type!]
+    error: WeaknessError
+}
+
 type Query {
     """Queries for a Pokemon specified by ``no``."""
     pokemon(
         """The Pokemon number, in the range of '0001' and '9999'."""
         no: PokemonNumber!
     ): PokemonResponse!
+
+    """Queries the weaknesses of the Pokemon specified by ``no``."""
+    weakness(
+        """The Pokemon number."""
+        no: PokemonNumber!
+    ): WeaknessResponse!
 }

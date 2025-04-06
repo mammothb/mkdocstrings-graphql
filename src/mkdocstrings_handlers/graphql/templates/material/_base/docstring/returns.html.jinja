@@ -1,0 +1,23 @@
+{#- Template for "Returns" sections in docstrings.
+
+Renders the returned type.
+
+Context:
+    section (DocstringSectionFields): The section to rend}.
+-#}
+
+{% block logs scoped %}
+    {#- Logging block. -#}
+    {{ log.debug("Rendering returns section.") }}
+{% endblock logs %}
+
+{% block list_styled scoped %}
+    <p><span class="doc-section-title">{{ section.title or "Returns:" }}</span></p>
+    <ul>
+        {% for field in section.value %}
+            <li class="doc-section-item field-body">
+                {{ field.annotation }}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock list_styled %}
