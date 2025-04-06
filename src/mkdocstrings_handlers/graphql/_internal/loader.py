@@ -177,7 +177,7 @@ class Loader:
             types=[TypeName(name=type_node.name.value) for type_node in node.types],
         )
 
-    def _parse_enum_values(self, nodes: tuple[EnumValueDefinitionNode, ...]) -> list[EnumValue]:
+    def _parse_enum_values(self, nodes: Collection[EnumValueDefinitionNode]) -> list[EnumValue]:
         return [
             EnumValue(name=node.name.value, description=self._parse_description(node.description)) for node in nodes
         ]
@@ -185,7 +185,7 @@ class Loader:
     def _parse_description(self, node: StringValueNode | None) -> str:
         return node.value if node is not None else ""
 
-    def _parse_fields(self, nodes: tuple[FieldDefinitionNode, ...]) -> list[Field]:
+    def _parse_fields(self, nodes: Collection[FieldDefinitionNode]) -> list[Field]:
         return [
             Field(
                 name=node.name.value,
@@ -195,7 +195,7 @@ class Loader:
             for node in nodes
         ]
 
-    def _parse_input_values(self, nodes: tuple[InputValueDefinitionNode, ...]) -> list[Input]:
+    def _parse_input_values(self, nodes: Collection[InputValueDefinitionNode]) -> list[Input]:
         return [
             Input(
                 name=node.name.value,
@@ -233,28 +233,27 @@ class Loader:
         raise ValueError(msg)
 
     def _populate_canonical_paths(self, schema_name: SchemaName) -> None:
-        for node in self.schemas_collection[schema_name].values():
-            if type(node) is ObjectTypeNode or type(node) is InterfaceTypeNode:
-                for field in node.fields:
-                    if field.type.name in self.schemas_collection[schema_name]:
-                        field.type.canonical_path = f"{schema_name}.{field.type.name}"
-                for type_name in node.interfaces:
-                    if type_name.name in self.schemas_collection[schema_name]:
-                        type_name.canonical_path = f"{schema_name}.{type_name.name}"
-            elif type(node) is InputObjectTypeNode:
-                for field in node.fields:
-                    if field.type.name in self.schemas_collection[schema_name]:
-                        field.type.canonical_path = f"{schema_name}.{field.type.name}"
-            elif type(node) is OperationTypeNode:
-                for argument in node.arguments:
-                    if argument.type.name in self.schemas_collection[schema_name]:
-                        argument.type.canonical_path = f"{schema_name}.{argument.type.name}"
+        def populate_fields(nodes: Collection[Field | Input]) -> None:
+            for node in nodes:
                 if node.type.name in self.schemas_collection[schema_name]:
                     node.type.canonical_path = f"{schema_name}.{node.type.name}"
+
+        def populate_annotations(nodes: Collection[Annotation | TypeName]) -> None:
+            for node in nodes:
+                if node.name in self.schemas_collection[schema_name]:
+                    node.canonical_path = f"{schema_name}.{node.name}"
+
+        for node in self.schemas_collection[schema_name].values():
+            if type(node) is ObjectTypeNode or type(node) is InterfaceTypeNode:
+                populate_fields(node.fields)
+                populate_annotations(node.interfaces)
+            elif type(node) is InputObjectTypeNode:
+                populate_fields(node.fields)
+            elif type(node) is OperationTypeNode:
+                populate_fields(node.arguments)
+                populate_annotations([node.type])
             elif type(node) is UnionTypeNode:
-                for type_name in node.types:
-                    if type_name.name in self.schemas_collection[schema_name]:
-                        type_name.canonical_path = f"{schema_name}.{type_name.name}"
+                populate_annotations(node.types)
 
     def _read_graph_file(self, path: Path) -> str:
         with open(path, encoding="utf-8") as f:
