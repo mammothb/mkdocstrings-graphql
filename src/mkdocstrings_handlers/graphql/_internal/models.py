@@ -124,6 +124,7 @@ class InterfaceTypeNode(Node):
 
     description: str
     fields: list[Field]
+    interfaces: list[TypeName]
 
     @property
     def docstring(self) -> Sequence[DocstringSection]:
@@ -164,6 +165,7 @@ class ObjectTypeNode(Node):
 
     description: str
     fields: list[Field]
+    interfaces: list[TypeName]
 
     @property
     def docstring(self) -> Sequence[DocstringSection]:

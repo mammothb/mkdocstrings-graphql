@@ -45,7 +45,7 @@ from mkdocstrings_handlers.graphql._internal.models import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Generator, Sequence
+    from collections.abc import Collection, Generator
 
     from graphql.language.ast import DocumentNode
 
@@ -56,7 +56,7 @@ class Loader:
     def __init__(
         self,
         *,
-        schema_paths: Sequence[str | Path],
+        schema_paths: Collection[str | Path],
         schemas_collection: SchemasCollection | None = None,
     ) -> None:
         self.schemas_collection: SchemasCollection = schemas_collection or SchemasCollection()
@@ -134,6 +134,7 @@ class Loader:
             path=f"{schema_name}.{name}",
             description=self._parse_description(node.description),
             fields=self._parse_fields(node.fields),
+            interfaces=self._parse_interfaces(node.interfaces),
         )
 
     def _load_object(self, schema_name: SchemaName, node: ObjectTypeDefinitionNode) -> ObjectTypeNode:
@@ -143,6 +144,7 @@ class Loader:
             path=f"{schema_name}.{name}",
             description=self._parse_description(node.description),
             fields=self._parse_fields(node.fields),
+            interfaces=self._parse_interfaces(node.interfaces),
         )
 
     def _load_operation(self, schema: str, op_name: str, node: FieldDefinitionNode) -> OperationTypeNode:
@@ -180,6 +182,9 @@ class Loader:
             EnumValue(name=node.name.value, description=self._parse_description(node.description)) for node in nodes
         ]
 
+    def _parse_description(self, node: StringValueNode | None) -> str:
+        return node.value if node is not None else ""
+
     def _parse_fields(self, nodes: tuple[FieldDefinitionNode, ...]) -> list[Field]:
         return [
             Field(
@@ -190,9 +195,6 @@ class Loader:
             for node in nodes
         ]
 
-    def _parse_description(self, node: StringValueNode | None) -> str:
-        return node.value if node is not None else ""
-
     def _parse_input_values(self, nodes: tuple[InputValueDefinitionNode, ...]) -> list[Input]:
         return [
             Input(
@@ -202,6 +204,9 @@ class Loader:
             )
             for node in nodes
         ]
+
+    def _parse_interfaces(self, nodes: Collection[NamedTypeNode]) -> list[TypeName]:
+        return [TypeName(name=node.name.value) for node in nodes]
 
     def _parse_type(
         self,
@@ -229,7 +234,14 @@ class Loader:
 
     def _populate_canonical_paths(self, schema_name: SchemaName) -> None:
         for node in self.schemas_collection[schema_name].values():
-            if type(node) is ObjectTypeNode or type(node) is InputObjectTypeNode or type(node) is InterfaceTypeNode:
+            if type(node) is ObjectTypeNode or type(node) is InterfaceTypeNode:
+                for field in node.fields:
+                    if field.type.name in self.schemas_collection[schema_name]:
+                        field.type.canonical_path = f"{schema_name}.{field.type.name}"
+                for type_name in node.interfaces:
+                    if type_name.name in self.schemas_collection[schema_name]:
+                        type_name.canonical_path = f"{schema_name}.{type_name.name}"
+            elif type(node) is InputObjectTypeNode:
                 for field in node.fields:
                     if field.type.name in self.schemas_collection[schema_name]:
                         field.type.canonical_path = f"{schema_name}.{field.type.name}"

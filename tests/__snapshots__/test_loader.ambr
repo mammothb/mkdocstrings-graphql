@@ -82,6 +82,8 @@
             }),
           }),
         ]),
+        'interfaces': list([
+        ]),
         'name': 'Annotation',
         'path': 'schemaName.Annotation',
       }),
@@ -177,6 +179,16 @@
             }),
           }),
         ]),
+        'interfaces': list([
+          dict({
+            'canonical_path': 'schemaName.Annotation',
+            'name': 'Annotation',
+          }),
+          dict({
+            'canonical_path': 'schemaName.Error',
+            'name': 'Error',
+          }),
+        ]),
         'name': 'AnnotationErrorImpl',
         'path': 'schemaName.AnnotationErrorImpl',
       }),
@@ -259,6 +271,12 @@
               'non_null': True,
               'non_null_list': False,
             }),
+          }),
+        ]),
+        'interfaces': list([
+          dict({
+            'canonical_path': 'schemaName.Annotation',
+            'name': 'Annotation',
           }),
         ]),
         'name': 'AnnotationImpl',
@@ -367,6 +385,8 @@
             }),
           }),
         ]),
+        'interfaces': list([
+        ]),
         'name': 'CreatePokemonResponse',
         'path': 'schemaName.CreatePokemonResponse',
       }),
@@ -385,8 +405,45 @@
             }),
           }),
         ]),
+        'interfaces': list([
+        ]),
         'name': 'Error',
         'path': 'schemaName.Error',
+      }),
+      'ErrorInterface': dict({
+        'description': 'Generic error interface.',
+        'fields': list([
+          dict({
+            'description': 'Error message.',
+            'name': 'message',
+            'type': dict({
+              'canonical_path': None,
+              'is_list': False,
+              'name': 'String',
+              'non_null': True,
+              'non_null_list': False,
+            }),
+          }),
+          dict({
+            'description': '',
+            'name': 'code',
+            'type': dict({
+              'canonical_path': None,
+              'is_list': False,
+              'name': 'Int',
+              'non_null': True,
+              'non_null_list': False,
+            }),
+          }),
+        ]),
+        'interfaces': list([
+          dict({
+            'canonical_path': 'schemaName.Error',
+            'name': 'Error',
+          }),
+        ]),
+        'name': 'ErrorInterface',
+        'path': 'schemaName.ErrorInterface',
       }),
       'EvolutionNode': dict({
         'description': '',
@@ -413,6 +470,8 @@
               'non_null_list': False,
             }),
           }),
+        ]),
+        'interfaces': list([
         ]),
         'name': 'EvolutionNode',
         'path': 'schemaName.EvolutionNode',
@@ -441,6 +500,12 @@
               'non_null': True,
               'non_null_list': False,
             }),
+          }),
+        ]),
+        'interfaces': list([
+          dict({
+            'canonical_path': 'schemaName.Error',
+            'name': 'Error',
           }),
         ]),
         'name': 'InvalidPokemonNumberError',
@@ -529,6 +594,12 @@
             }),
           }),
         ]),
+        'interfaces': list([
+          dict({
+            'canonical_path': 'schemaName.Error',
+            'name': 'Error',
+          }),
+        ]),
         'name': 'PokemonExistsError',
         'path': 'schemaName.PokemonExistsError',
       }),
@@ -591,6 +662,8 @@
             }),
           }),
         ]),
+        'interfaces': list([
+        ]),
         'name': 'PokemonNode',
         'path': 'schemaName.PokemonNode',
       }),
@@ -618,6 +691,12 @@
               'non_null': True,
               'non_null_list': False,
             }),
+          }),
+        ]),
+        'interfaces': list([
+          dict({
+            'canonical_path': 'schemaName.Error',
+            'name': 'Error',
           }),
         ]),
         'name': 'PokemonNotFoundError',
@@ -653,6 +732,8 @@
               'non_null_list': False,
             }),
           }),
+        ]),
+        'interfaces': list([
         ]),
         'name': 'PokemonResponse',
         'path': 'schemaName.PokemonResponse',
@@ -800,6 +881,8 @@
             }),
           }),
         ]),
+        'interfaces': list([
+        ]),
         'name': 'TypeNode',
         'path': 'schemaName.TypeNode',
       }),
@@ -843,6 +926,8 @@
               'non_null_list': False,
             }),
           }),
+        ]),
+        'interfaces': list([
         ]),
         'name': 'WeaknessResponse',
         'path': 'schemaName.WeaknessResponse',
