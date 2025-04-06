@@ -18,7 +18,9 @@ from mkdocstrings_handlers.graphql._internal.docstring_models import (
 from mkdocstrings_handlers.graphql._internal.enum import Kind
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
+    from collections.abc import ItemsView, KeysView, Sequence, ValuesView
+
+    from mkdocstrings_handlers.graphql._internal.expressions import Annotation, TypeName
 
 SchemaName = str
 
@@ -31,25 +33,6 @@ class Node:
 
     name: str
     path: str
-
-
-@dataclass
-class Annotation:
-    name: str
-    non_null: bool
-    is_list: bool
-    non_null_list: bool
-
-    @property
-    def render(self) -> str:
-        rendered = self.name
-        if self.non_null:
-            rendered = f"{rendered}!"
-        if self.is_list:
-            rendered = f"[{rendered}]"
-        if self.non_null_list:
-            rendered = f"{rendered}!"
-        return rendered
 
 
 @dataclass
@@ -105,6 +88,15 @@ class Schema:
     def operation_types(self) -> frozenset[str]:
         return getattr(self.definition, "types", frozenset())
 
+    def items(self) -> ItemsView[str, Node]:
+        return self.members.items()
+
+    def keys(self) -> KeysView[str]:
+        return self.members.keys()
+
+    def values(self) -> ValuesView[Node]:
+        return self.members.values()
+
 
 #######
 # Nodes
@@ -128,10 +120,22 @@ class EnumTypeNode(Node):
 
 @dataclass
 class InterfaceTypeNode(Node):
-    kind: ClassVar[Kind] = Kind.INTERFACE
+    kind: ClassVar[Kind] = Kind.OBJECT
 
     description: str
     fields: list[Field]
+
+    @property
+    def docstring(self) -> Sequence[DocstringSection]:
+        return [
+            DocstringSectionText(value=self.description),
+            DocstringSectionFields(
+                value=[
+                    DocstringField(name=field.name, description=field.description, annotation=field.type)
+                    for field in self.fields
+                ]
+            ),
+        ]
 
 
 @dataclass
@@ -147,11 +151,7 @@ class InputObjectTypeNode(Node):
             DocstringSectionText(value=self.description),
             DocstringSectionFields(
                 value=[
-                    DocstringField(
-                        name=field.name,
-                        description=field.description,
-                        annotation=field.type.render,
-                    )
+                    DocstringField(name=field.name, description=field.description, annotation=field.type)
                     for field in self.fields
                 ]
             ),
@@ -171,11 +171,7 @@ class ObjectTypeNode(Node):
             DocstringSectionText(value=self.description),
             DocstringSectionFields(
                 value=[
-                    DocstringField(
-                        name=field.name,
-                        description=field.description,
-                        annotation=field.type.render,
-                    )
+                    DocstringField(name=field.name, description=field.description, annotation=field.type)
                     for field in self.fields
                 ]
             ),
@@ -196,15 +192,11 @@ class OperationTypeNode(Node):
             DocstringSectionText(value=self.description),
             DocstringSectionArguments(
                 value=[
-                    DocstringArgument(
-                        name=argument.name,
-                        description=argument.description,
-                        annotation=argument.type.render,
-                    )
+                    DocstringArgument(name=argument.name, description=argument.description, annotation=argument.type)
                     for argument in self.arguments
                 ]
             ),
-            DocstringSectionReturns(value=[DocstringReturn(description="", annotation=self.type.render)]),
+            DocstringSectionReturns(value=[DocstringReturn(description="", annotation=self.type)]),
         ]
 
 
@@ -224,7 +216,7 @@ class UnionTypeNode(Node):
     kind: ClassVar[Kind] = Kind.UNION
 
     description: str
-    types: list[str]
+    types: list[TypeName]
 
     @property
     def docstring(self) -> Sequence[DocstringSection]:

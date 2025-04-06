@@ -77,6 +77,26 @@ type AnnotationImpl implements Annotation {
     custom: Int!
 }
 
+"""Object implementing multiple interfaces."""
+type AnnotationErrorImpl implements Annotation & Error {
+    """Error message."""
+    message: String!
+    """Nullable element."""
+    null: String
+    """Non-nullable element."""
+    non_null: String!
+    """Nullable list with nullable elements."""
+    null_list_null: [String]
+    """Nullable list with non-nullable elements."""
+    null_list_non_null: [String!]
+    """Non-nullable list with nullable elements."""
+    non_null_list_null: [String]!
+    """Non-nullable list with non-nullable elements."""
+    non_null_list_non_null: [String!]!
+    """Custom element."""
+    custom: Int!
+}
+
 type InvalidPokemonNumberError implements Error {
     message: String!
     no: PokemonNumber!

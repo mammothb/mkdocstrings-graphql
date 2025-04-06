@@ -1,14 +1,17 @@
 from __future__ import annotations
 
-from typing import Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
 
 from mkdocstrings_handlers.graphql._internal.enum import DocstringSectionKind
 
+if TYPE_CHECKING:
+    from mkdocstrings_handlers.graphql._internal.expressions import Annotation
+
 
 class DocstringElement:
-    def __init__(self, *, description: str, annotation: str | None = None) -> None:
+    def __init__(self, *, description: str, annotation: str | Annotation | None = None) -> None:
         self.description: str = description
-        self.annotation: str | None = annotation
+        self.annotation: str | Annotation | None = annotation
 
 
 class DocstringNamedElement(DocstringElement):
@@ -17,7 +20,7 @@ class DocstringNamedElement(DocstringElement):
         name: str,
         *,
         description: str,
-        annotation: str | None = None,
+        annotation: str | Annotation | None = None,
         value: str | None = None,
     ) -> None:
         super().__init__(description=description, annotation=annotation)
@@ -55,9 +58,7 @@ class DocstringSection:
 class DocstringSectionArguments(DocstringSection):
     kind: ClassVar[DocstringSectionKind] = DocstringSectionKind.ARGUMENTS
 
-    def __init__(
-        self, value: list[DocstringArgument], title: str | None = None
-    ) -> None:
+    def __init__(self, value: list[DocstringArgument], title: str | None = None) -> None:
         super().__init__(title)
         self.value: list[DocstringArgument] = value
 
@@ -65,9 +66,7 @@ class DocstringSectionArguments(DocstringSection):
 class DocstringSectionEnumValues(DocstringSection):
     kind: ClassVar[DocstringSectionKind] = DocstringSectionKind.ENUM_VALUES
 
-    def __init__(
-        self, value: list[DocstringEnumValue], title: str | None = None
-    ) -> None:
+    def __init__(self, value: list[DocstringEnumValue], title: str | None = None) -> None:
         super().__init__(title)
         self.value: list[DocstringEnumValue] = value
 

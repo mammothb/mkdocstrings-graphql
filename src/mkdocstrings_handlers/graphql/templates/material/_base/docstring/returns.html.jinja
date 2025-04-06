@@ -16,7 +16,9 @@ Context:
     <ul>
         {% for field in section.value %}
             <li class="doc-section-item field-body">
-                {{ field.annotation }}
+                {% with expression = field.annotation, backlink_type = "used-by" %}
+                    <code>{% include "expression.html.jinja" with context %}</code>
+                {% endwith %}
             </li>
         {% endfor %}
     </ul>
