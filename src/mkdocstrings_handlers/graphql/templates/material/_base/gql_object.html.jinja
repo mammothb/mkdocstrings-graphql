@@ -46,6 +46,21 @@ Context:
                 that the user can override. Override the contents block allows
                 to rearrange the order of the blocks.
                 -#}
+                {% block interfaces scoped %}
+                    {#- Implemented interfaces block. -#}
+                    {% if gql_object.interfaces is defined and gql_object.interfaces|length > 0%}
+                        <p class="doc doc-object-interfaces">
+                            Interfaces: {% for expression in gql_object.interfaces -%}
+                                <code>
+                                    {%- with backlink_type = "subclassed-by" -%}
+                                        {%- include "expression.html.jinja" -%}
+                                    {%- endwith -%}
+                                </code>{% if not loop.last %}, {% endif %}
+                            {% endfor -%}
+                        </p>
+                    {% endif %}
+                {% endblock interfaces %}
+
                 {% block docstring scoped %}
                     {#- Docstring block. -#}
                     {% with docstring_sections = gql_object.docstring %}

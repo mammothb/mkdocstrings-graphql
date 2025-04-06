@@ -115,6 +115,7 @@ def test_load_interface(tmp_path: Path) -> None:
                 type=Annotation(name="String", non_null=True, is_list=False, non_null_list=False),
             ),
         ],
+        interfaces=[],
     )
 
 
@@ -146,6 +147,7 @@ def test_load_object(tmp_path: Path) -> None:
                 type=Annotation(name="String", non_null=True, is_list=False, non_null_list=False),
             ),
         ],
+        interfaces=[],
     )
 
 
@@ -348,6 +350,7 @@ def test_parse_type(tmp_path: Path) -> None:
                 type=Annotation(name="String", non_null=True, is_list=True, non_null_list=True),
             ),
         ],
+        interfaces=[],
     )
 
 

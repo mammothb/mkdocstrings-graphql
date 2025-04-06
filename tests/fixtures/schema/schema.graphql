@@ -44,6 +44,13 @@ interface Error {
     message: String!
 }
 
+"""Generic error interface."""
+interface ErrorInterface implements Error {
+    """Error message."""
+    message: String!
+    code: Int!
+}
+
 """Interface containing all annotation combinations."""
 interface Annotation {
     """Nullable element."""
