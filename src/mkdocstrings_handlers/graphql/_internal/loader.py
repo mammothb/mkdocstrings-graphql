@@ -27,7 +27,7 @@ from graphql.language.ast import (
 from graphql.language.parser import parse
 from mkdocstrings_handlers.graphql._internal.collections import SchemasCollection
 from mkdocstrings_handlers.graphql._internal.error import GraphQLFileSyntaxError
-from mkdocstrings_handlers.graphql._internal.expressions import Annotation
+from mkdocstrings_handlers.graphql._internal.expressions import Annotation, TypeName
 from mkdocstrings_handlers.graphql._internal.models import (
     EnumTypeNode,
     EnumValue,
@@ -172,7 +172,7 @@ class Loader:
             name=name,
             path=f"{schema_name}.{name}",
             description=self._parse_description(node.description),
-            types=[type_node.name.value for type_node in node.types],
+            types=[TypeName(name=type_node.name.value) for type_node in node.types],
         )
 
     def _parse_enum_values(self, nodes: tuple[EnumValueDefinitionNode, ...]) -> list[EnumValue]:
@@ -239,6 +239,10 @@ class Loader:
                         argument.type.canonical_path = f"{schema_name}.{argument.type.name}"
                 if node.type.name in self.schemas_collection[schema_name]:
                     node.type.canonical_path = f"{schema_name}.{node.type.name}"
+            elif type(node) is UnionTypeNode:
+                for type_name in node.types:
+                    if type_name.name in self.schemas_collection[schema_name]:
+                        type_name.canonical_path = f"{schema_name}.{type_name.name}"
 
     def _read_graph_file(self, path: Path) -> str:
         with open(path, encoding="utf-8") as f:

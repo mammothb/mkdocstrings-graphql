@@ -20,7 +20,7 @@ from mkdocstrings_handlers.graphql._internal.enum import Kind
 if TYPE_CHECKING:
     from collections.abc import ItemsView, KeysView, Sequence, ValuesView
 
-    from mkdocstrings_handlers.graphql._internal.expressions import Annotation
+    from mkdocstrings_handlers.graphql._internal.expressions import Annotation, TypeName
 
 SchemaName = str
 
@@ -216,7 +216,7 @@ class UnionTypeNode(Node):
     kind: ClassVar[Kind] = Kind.UNION
 
     description: str
-    types: list[str]
+    types: list[TypeName]
 
     @property
     def docstring(self) -> Sequence[DocstringSection]:

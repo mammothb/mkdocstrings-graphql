@@ -32,7 +32,7 @@ expression.
     -#}
     {%- if expression is string -%}
         {%- if signature -%}{{ expression|safe }}{%- else -%}{{ expression }}{%- endif -%}
-    {%- elif expression.class_name == "Annotation" -%}
+    {%- elif expression.class_name == "Annotation" or expression.class_name == "TypeName" -%}
         {{ crossref(expression, backlink_type) }}
     {% else %}
         {{ expression.render }}

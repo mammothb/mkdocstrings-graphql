@@ -16,6 +16,15 @@ class Expr:
 
 
 @dataclass
+class TypeName(Expr):
+    name: str
+
+    @property
+    def render(self) -> str:
+        return self.name
+
+
+@dataclass
 class Annotation(Expr):
     name: str
     non_null: bool

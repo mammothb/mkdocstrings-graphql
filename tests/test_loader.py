@@ -1,13 +1,11 @@
+from dataclasses import asdict
 from pathlib import Path
 
 import pytest
 from syrupy.assertion import SnapshotAssertion
-from syrupy.extensions.amber.serializer import AmberDataSerializer
-from syrupy.filters import props
-from syrupy.matchers import path_type
 
 from mkdocstrings_handlers.graphql._internal.error import GraphQLFileSyntaxError
-from mkdocstrings_handlers.graphql._internal.expressions import Annotation
+from mkdocstrings_handlers.graphql._internal.expressions import Annotation, TypeName
 from mkdocstrings_handlers.graphql._internal.loader import Loader
 from mkdocstrings_handlers.graphql._internal.models import (
     EnumTypeNode,
@@ -19,7 +17,6 @@ from mkdocstrings_handlers.graphql._internal.models import (
     ObjectTypeNode,
     OperationTypeNode,
     ScalarTypeNode,
-    Schema,
     UnionTypeNode,
 )
 
@@ -291,8 +288,11 @@ def test_load_union(tmp_path: Path) -> None:
 
     assert "TestObject1" in loader.schemas_collection["schemaName"]
     assert "TestObject2" in loader.schemas_collection["schemaName"]
+    types = [TypeName(name="TestObject1"), TypeName("TestObject2")]
+    types[0].canonical_path = "schemaName.TestObject1"
+    types[1].canonical_path = "schemaName.TestObject2"
     assert loader.schemas_collection["schemaName"]["TestUnion"] == UnionTypeNode(
-        name="TestUnion", path="schemaName.TestUnion", description="", types=["TestObject1", "TestObject2"]
+        name="TestUnion", path="schemaName.TestUnion", description="", types=types
     )
 
 
@@ -357,10 +357,5 @@ def test_load_multiple_files(snapshot: SnapshotAssertion) -> None:
     loader = Loader(schema_paths=[schema_dir / "constructs.graphql", schema_dir / "schema.graphql"])
     loader.load(schema_name="schemaName")
 
-    assert loader.schemas_collection["schemaName"] == snapshot(
-        exclude=props("definition"),
-        matcher=path_type(
-            types=(Schema,),
-            replacer=lambda data, *_: AmberDataSerializer.object_as_named_tuple(data),
-        ),
-    )
+    collection_dict = asdict(loader.schemas_collection["schemaName"])
+    assert collection_dict == snapshot
