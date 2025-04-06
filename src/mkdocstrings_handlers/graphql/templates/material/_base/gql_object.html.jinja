@@ -47,7 +47,7 @@ Context:
                 to rearrange the order of the blocks.
                 -#}
                 {% block interfaces scoped %}
-                    {#- Union types block. -#}
+                    {#- Implemented interfaces block. -#}
                     {% if gql_object.interfaces is defined and gql_object.interfaces|length > 0%}
                         <p class="doc doc-object-interfaces">
                             Interfaces: {% for expression in gql_object.interfaces -%}
