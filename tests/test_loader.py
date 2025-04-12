@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 from syrupy.assertion import SnapshotAssertion
 
-from mkdocstrings_handlers.graphql._internal.error import GraphQLFileSyntaxError
+from mkdocstrings_handlers.graphql._internal.errors import GraphQLFileSyntaxError
 from mkdocstrings_handlers.graphql._internal.expressions import Annotation, TypeName
 from mkdocstrings_handlers.graphql._internal.loader import Loader
 from mkdocstrings_handlers.graphql._internal.models import (

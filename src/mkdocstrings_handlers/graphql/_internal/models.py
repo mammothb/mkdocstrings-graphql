@@ -15,7 +15,7 @@ from mkdocstrings_handlers.graphql._internal.docstring_models import (
     DocstringSectionReturns,
     DocstringSectionText,
 )
-from mkdocstrings_handlers.graphql._internal.enum import Kind
+from mkdocstrings_handlers.graphql._internal.enumerations import Kind
 
 if TYPE_CHECKING:
     from collections.abc import ItemsView, KeysView, Sequence, ValuesView

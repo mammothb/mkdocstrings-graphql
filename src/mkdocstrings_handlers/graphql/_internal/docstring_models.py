@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, ClassVar
 
-from mkdocstrings_handlers.graphql._internal.enum import DocstringSectionKind
+from mkdocstrings_handlers.graphql._internal.enumerations import DocstringSectionKind
 
 if TYPE_CHECKING:
     from mkdocstrings_handlers.graphql._internal.expressions import Annotation

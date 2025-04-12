@@ -142,6 +142,7 @@ ban-relative-imports = "all"
 
 [tool.ruff.lint.isort]
 known-first-party = ["mkdocstrings_handlers.graphql"]
+known-third-party = ["graphql"]
 
 [tool.ruff.lint.per-file-ignores]
 "!src/*/*.py" = [

@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any
 from jinja2.utils import pass_context
 from markupsafe import Markup
 
-from mkdocstrings_handlers.graphql._internal.enum import Kind
+from mkdocstrings_handlers.graphql._internal.enumerations import Kind
 
 if TYPE_CHECKING:
     from jinja2.runtime import Context

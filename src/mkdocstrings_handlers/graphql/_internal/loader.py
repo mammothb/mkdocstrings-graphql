@@ -4,8 +4,6 @@ import os
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from mkdocstrings import get_logger
-
 from graphql.error.syntax_error import GraphQLSyntaxError
 from graphql.language.ast import (
     EnumTypeDefinitionNode,
@@ -25,8 +23,10 @@ from graphql.language.ast import (
     UnionTypeDefinitionNode,
 )
 from graphql.language.parser import parse
+from mkdocstrings import get_logger
+
 from mkdocstrings_handlers.graphql._internal.collections import SchemasCollection
-from mkdocstrings_handlers.graphql._internal.error import GraphQLFileSyntaxError
+from mkdocstrings_handlers.graphql._internal.errors import GraphQLFileSyntaxError
 from mkdocstrings_handlers.graphql._internal.expressions import Annotation, TypeName
 from mkdocstrings_handlers.graphql._internal.models import (
     EnumTypeNode,

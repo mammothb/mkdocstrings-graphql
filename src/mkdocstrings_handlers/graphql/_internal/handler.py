@@ -12,7 +12,7 @@ from mkdocstrings import BaseHandler, CollectionError, CollectorItem, get_logger
 from mkdocstrings_handlers.graphql._internal import render
 from mkdocstrings_handlers.graphql._internal.collections import SchemasCollection
 from mkdocstrings_handlers.graphql._internal.config import GraphQLConfig, GraphQLOptions
-from mkdocstrings_handlers.graphql._internal.enum import Kind
+from mkdocstrings_handlers.graphql._internal.enumerations import Kind
 from mkdocstrings_handlers.graphql._internal.loader import Loader
 
 if TYPE_CHECKING:
