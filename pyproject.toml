@@ -150,10 +150,12 @@ known-third-party = ["graphql"]
 ]
 "!src/**.py" = [
     "D101",  # Missing docstring in public class
+    "D102",  # Missing docstring in public method
     "D103",  # Missing docstring in public function
 ]
 "tests/**.py" = [
     "EM101",  # Raw string in exception
+    "PLR2004", # Magic value used in comparison
     "S101",  # Use of assert detected
 ]
 
