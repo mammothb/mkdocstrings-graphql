@@ -137,15 +137,6 @@ class GraphQLHandler(BaseHandler):
             msg = f"Failed to parse identifier '{identifier}'"
             raise CollectionError(msg) from err
 
-        is_wildcard_directive = member_path == "*"
-
-        if is_wildcard_directive and options.kind is None:
-            msg = "Local configuration 'kind' must be set when using wildcard directive"
-            raise CollectionError(msg)
-
-        if not is_wildcard_directive and options.kind is not None:
-            _logger.warning("Local option 'kind' has no effect when not using wildcard directive")
-
         unknown_schema = schema_name not in self._schemas_collection
         if unknown_schema:
             loader = Loader(
@@ -154,16 +145,23 @@ class GraphQLHandler(BaseHandler):
             )
             loader.load(schema_name)
 
+        is_wildcard_directive = member_path == "*"
+
         if is_wildcard_directive:
+            if options.kind is None:
+                msg = "Local configuration 'kind' must be set when using wildcard directive"
+                raise CollectionError(msg)
+
             try:
-                assert options.kind is not None
                 kind = Kind[options.kind]
             except Exception as err:
                 msg = f"'kind' must be one of {Kind.public_members()}"
                 raise CollectionError(msg) from err
 
-            items = [item for item in self._schemas_collection[schema_name].values() if item.kind == kind]
-            return items
+            return [item for item in self._schemas_collection[schema_name].values() if item.kind == kind]
+
+        if options.kind is not None:
+            _logger.warning("Local option 'kind' has no effect when not using wildcard directive")
 
         return self._schemas_collection[schema_name][member_path]
 
@@ -179,10 +177,7 @@ class GraphQLHandler(BaseHandler):
             The rendered data in HTML.
         """
         if isinstance(data, list):
-            rendered = []
-            for item in data:
-                rendered.append(self.render(item, options))
-            return "".join(rendered)
+            return "".join(self.render(item, options) for item in data)
 
         template_name = render.get_template(data)
         template = self.env.get_template(template_name)

@@ -68,7 +68,7 @@ def get_template(node: Node) -> str:
 
 def map_kind(kind: Kind) -> str:
     """Maps ``kind`` to its string value."""
-    if kind == Kind.INPUT or kind == Kind.INTERFACE:
+    if kind in {Kind.INPUT, Kind.INTERFACE}:
         return Kind.OBJECT.value
     return kind.value
 
