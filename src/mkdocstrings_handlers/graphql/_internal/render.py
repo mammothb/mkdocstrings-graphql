@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING, Any
 from jinja2.utils import pass_context
 from markupsafe import Markup
 
+from mkdocstrings_handlers.graphql._internal.enum import Kind
+
 if TYPE_CHECKING:
     from jinja2.runtime import Context
 
@@ -61,8 +63,14 @@ def get_template(node: Node) -> str:
     Returns:
         A template name.
     """
-    name = node.kind.value
-    return f"{name}.html.jinja"
+    return f"{map_kind(node.kind)}.html.jinja"
+
+
+def map_kind(kind: Kind) -> str:
+    """Maps ``kind`` to its string value."""
+    if kind == Kind.INPUT or kind == Kind.INTERFACE:
+        return Kind.OBJECT.value
+    return kind.value
 
 
 def _format_signature(name: Markup, signature: str) -> str:

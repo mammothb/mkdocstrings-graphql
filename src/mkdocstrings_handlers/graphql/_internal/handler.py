@@ -12,6 +12,7 @@ from mkdocstrings import BaseHandler, CollectionError, CollectorItem, get_logger
 from mkdocstrings_handlers.graphql._internal import render
 from mkdocstrings_handlers.graphql._internal.collections import SchemasCollection
 from mkdocstrings_handlers.graphql._internal.config import GraphQLConfig, GraphQLOptions
+from mkdocstrings_handlers.graphql._internal.enum import Kind
 from mkdocstrings_handlers.graphql._internal.loader import Loader
 
 if TYPE_CHECKING:
@@ -105,8 +106,7 @@ class GraphQLHandler(BaseHandler):
         Returns:
             The combined options.
         """
-        extra = {**getattr(self.global_options, "extra", {}), **local_options.get("extra", {})}
-        options = {**asdict(self.global_options), **local_options, "extra": extra}
+        options = {**asdict(self.global_options), **local_options}
         try:
             return GraphQLOptions.from_data(**options)
         except Exception as error:
@@ -114,7 +114,7 @@ class GraphQLHandler(BaseHandler):
             raise PluginError(msg) from error
 
     @override
-    def collect(self, identifier: str, options: GraphQLOptions) -> CollectorItem:
+    def collect(self, identifier: str, options: GraphQLOptions) -> CollectorItem | list[CollectorItem]:
         """Collects data given an identifier and selection configuration.
 
         Args:
@@ -122,15 +122,30 @@ class GraphQLHandler(BaseHandler):
             options: The options to use for the collection.
 
         Returns:
-            The collected item.
+            The collected item or a list of collected items if a wildcard
+            directive is provided.
 
         Raises:
-            CollectionError: If ``identifier`` is an empty string.
+            CollectionError: If ``identifier`` cannot be parsed into two parts.
+            CollectionError: If a wildcard directive is provided by local option
+                'kind' is not specified.
+            CollectionError: If local option 'kind' is invalid.
         """
-        if not identifier:
-            msg = "Empty identifier"
+        try:
+            schema_name, member_path = identifier.split(".", 1)
+        except Exception as err:
+            msg = f"Failed to parse identifier '{identifier}'"
+            raise CollectionError(msg) from err
+
+        is_wildcard_directive = member_path == "*"
+
+        if is_wildcard_directive and options.kind is None:
+            msg = "Local configuration 'kind' must be set when using wildcard directive"
             raise CollectionError(msg)
-        schema_name, member_path = identifier.split(".", 1)
+
+        if not is_wildcard_directive and options.kind is not None:
+            _logger.warning("Local option 'kind' has no effect when not using wildcard directive")
+
         unknown_schema = schema_name not in self._schemas_collection
         if unknown_schema:
             loader = Loader(
@@ -138,10 +153,22 @@ class GraphQLHandler(BaseHandler):
                 schemas_collection=self._schemas_collection,
             )
             loader.load(schema_name)
+
+        if is_wildcard_directive:
+            try:
+                assert options.kind is not None
+                kind = Kind[options.kind]
+            except Exception as err:
+                msg = f"'kind' must be one of {Kind.public_members()}"
+                raise CollectionError(msg) from err
+
+            items = [item for item in self._schemas_collection[schema_name].values() if item.kind == kind]
+            return items
+
         return self._schemas_collection[schema_name][member_path]
 
     @override
-    def render(self, data: CollectorItem, options: GraphQLOptions) -> str:
+    def render(self, data: CollectorItem | list[CollectorItem], options: GraphQLOptions) -> str:
         """Renders the collected data.
 
         Args:
@@ -151,12 +178,18 @@ class GraphQLHandler(BaseHandler):
         Returns:
             The rendered data in HTML.
         """
+        if isinstance(data, list):
+            rendered = []
+            for item in data:
+                rendered.append(self.render(item, options))
+            return "".join(rendered)
+
         template_name = render.get_template(data)
         template = self.env.get_template(template_name)
         return template.render(
             **{
                 "config": options,
-                data.kind.value: data,
+                render.map_kind(data.kind): data,
                 "heading_level": options.heading_level,
                 "root": True,
             }

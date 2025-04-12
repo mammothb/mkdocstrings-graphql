@@ -120,7 +120,7 @@ class EnumTypeNode(Node):
 
 @dataclass
 class InterfaceTypeNode(Node):
-    kind: ClassVar[Kind] = Kind.OBJECT
+    kind: ClassVar[Kind] = Kind.INTERFACE
 
     description: str
     fields: list[Field]
@@ -141,7 +141,7 @@ class InterfaceTypeNode(Node):
 
 @dataclass
 class InputObjectTypeNode(Node):
-    kind: ClassVar[Kind] = Kind.OBJECT
+    kind: ClassVar[Kind] = Kind.INPUT
 
     description: str
     fields: list[Input]
