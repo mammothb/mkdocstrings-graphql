@@ -15,7 +15,7 @@ from mkdocstrings_handlers.graphql._internal.docstring_models import (
     DocstringSectionReturns,
     DocstringSectionText,
 )
-from mkdocstrings_handlers.graphql._internal.enum import Kind
+from mkdocstrings_handlers.graphql._internal.enumerations import Kind
 
 if TYPE_CHECKING:
     from collections.abc import ItemsView, KeysView, Sequence, ValuesView
@@ -120,7 +120,7 @@ class EnumTypeNode(Node):
 
 @dataclass
 class InterfaceTypeNode(Node):
-    kind: ClassVar[Kind] = Kind.OBJECT
+    kind: ClassVar[Kind] = Kind.INTERFACE
 
     description: str
     fields: list[Field]
@@ -141,7 +141,7 @@ class InterfaceTypeNode(Node):
 
 @dataclass
 class InputObjectTypeNode(Node):
-    kind: ClassVar[Kind] = Kind.OBJECT
+    kind: ClassVar[Kind] = Kind.INPUT
 
     description: str
     fields: list[Input]

@@ -24,3 +24,7 @@ class Kind(StrEnum):
     SCHEMA = "gql_schema"
     TYPE = "gql_type"
     UNION = "gql_union"
+
+    @staticmethod
+    def public_members() -> list[str]:
+        return [m.name for m in Kind.__members__.values()]

@@ -4,6 +4,7 @@ from mkdocstrings import CollectionError
 from mkdocstrings_handlers.graphql import GraphQLHandler, GraphQLOptions
 
 
-def test_collect_empty_identifier(handler: GraphQLHandler) -> None:
-    with pytest.raises(CollectionError, match="Empty identifier"):
-        handler.collect("", GraphQLOptions())
+@pytest.mark.parametrize("identifier", ["", "unsplittable"])
+def test_collect_invalid_identifier(identifier: str, handler: GraphQLHandler) -> None:
+    with pytest.raises(CollectionError, match=f"Failed to parse identifier '{identifier}'"):
+        handler.collect(identifier, GraphQLOptions())
