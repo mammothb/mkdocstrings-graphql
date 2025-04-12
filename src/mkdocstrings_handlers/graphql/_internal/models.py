@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import fnmatch
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, ClassVar
 
@@ -18,7 +19,7 @@ from mkdocstrings_handlers.graphql._internal.docstring_models import (
 from mkdocstrings_handlers.graphql._internal.enumerations import Kind
 
 if TYPE_CHECKING:
-    from collections.abc import ItemsView, KeysView, Sequence, ValuesView
+    from collections.abc import Generator, ItemsView, KeysView, Sequence, ValuesView
 
     from mkdocstrings_handlers.graphql._internal.expressions import Annotation, TypeName
 
@@ -87,6 +88,11 @@ class Schema:
     @property
     def operation_types(self) -> frozenset[str]:
         return getattr(self.definition, "types", frozenset())
+
+    def glob(self, pattern: str) -> Generator[Node]:
+        for key, value in self.items():
+            if fnmatch.fnmatch(key, pattern):
+                yield value
 
     def items(self) -> ItemsView[str, Node]:
         return self.members.items()

@@ -145,7 +145,7 @@ class GraphQLHandler(BaseHandler):
             )
             loader.load(schema_name)
 
-        is_wildcard_directive = member_path == "*"
+        is_wildcard_directive = member_path.endswith("*")
 
         if is_wildcard_directive:
             if options.kind is None:
@@ -158,7 +158,7 @@ class GraphQLHandler(BaseHandler):
                 msg = f"'kind' must be one of {Kind.public_members()}"
                 raise CollectionError(msg) from err
 
-            return [item for item in self._schemas_collection[schema_name].values() if item.kind == kind]
+            return [item for item in self._schemas_collection[schema_name].glob(member_path) if item.kind == kind]
 
         if options.kind is not None:
             _logger.warning("Local option 'kind' has no effect when not using wildcard directive")
