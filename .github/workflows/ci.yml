@@ -82,7 +82,7 @@ jobs:
       - name: Run the test suite
         run: uv run pytest
       - name: Upload code coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: mammothb/mkdocstrings-graphql
