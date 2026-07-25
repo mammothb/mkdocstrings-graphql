@@ -166,7 +166,14 @@ class GraphQLHandler(BaseHandler):
         return self._schemas_collection[schema_name][member_path]
 
     @override
-    def render(self, data: CollectorItem | list[CollectorItem], options: GraphQLOptions, locale: str | None = None) -> str:
+    def render(
+        self,
+        data: CollectorItem | list[CollectorItem],
+        options: GraphQLOptions,
+        locale: str | None = None,
+        *args: Any,
+        **kwargs: Any,
+    ) -> str:
         """Renders the collected data.
 
         Args:
@@ -178,7 +185,7 @@ class GraphQLHandler(BaseHandler):
             The rendered data in HTML.
         """
         if isinstance(data, list):
-            return "".join(self.render(item, options) for item in data)
+            return "".join(self.render(item, options, locale, *args, **kwargs) for item in data)
 
         template_name = render.get_template(data)
         template = self.env.get_template(template_name)
