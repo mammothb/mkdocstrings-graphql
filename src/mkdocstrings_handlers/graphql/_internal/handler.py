@@ -166,12 +166,13 @@ class GraphQLHandler(BaseHandler):
         return self._schemas_collection[schema_name][member_path]
 
     @override
-    def render(self, data: CollectorItem | list[CollectorItem], options: GraphQLOptions) -> str:
+    def render(self, data: CollectorItem | list[CollectorItem], options: GraphQLOptions, locale: str | None = None) -> str:
         """Renders the collected data.
 
         Args:
             data: The collected data.
             options: The options to use for rendering.
+            locale: Optional locale string passed by mkdocstrings (not used).
 
         Returns:
             The rendered data in HTML.
