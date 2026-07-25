@@ -132,6 +132,7 @@ ignore = [
     "PTH",
     "SLF001",  # Private member accessed
     "TRY003",  # Avoid specifying long messages outside the exception class
+    "CPY001",  # Missing copyright header — ignore repository-wide
 ]
 
 [tool.ruff.lint.flake8-quotes]
